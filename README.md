@@ -1,8 +1,8 @@
-# [your app name here]
+# [Arcade bar]
 
 CodePath WEB103 Final Project
 
-Designed and developed by: [your names here]
+Designed and developed by: [Moeez Ahmad, Tony Hernandez, Rodrigo Mendoza, Robert Berryman II]
 
 🔗 Link to deployed app:
 
@@ -10,11 +10,13 @@ Designed and developed by: [your names here]
 
 ### Description and Purpose
 
-[text goes here]
+[Our arcade bar is a fun, social hangout where guests can enjoy classic arcade games, drinks, and a lively atmosphere. The app will help users explore games, food and drink options, and events while making it easy to manage and update the experience.]
 
 ### Inspiration
 
-[text goes here]
+[Leaderboard Arcade]
+[The inspiration for this project came from a coworker who told me about a place called leaderboard arcade. After visiting, I noticed it felt different from places like Dave and Buster’s, which gave me the idea for this arcade bar app.]
+[LINk](https://leaderboardarcade.com/)
 
 ## Tech Stack
 
@@ -24,15 +26,15 @@ Backend:
 
 ## Features
 
-### [Name of Feature 1]
+### [ filter or sort]
 
-[short description goes here]
+[The user can filter or sort items based on particular criteria as appropriate for your use case.]
 
 [gif goes here]
 
-### [Name of Feature 2]
+### [handles errors]
 
-[short description goes here]
+[The web app gracefully handles errors.]
 
 [gif goes here]
 
