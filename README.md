@@ -1,4 +1,4 @@
-# [Arcade bar]
+# [Arcade Bar]
 
 CodePath WEB103 Final Project
 
@@ -20,13 +20,13 @@ Designed and developed by: [Moeez Ahmad, Tony Hernandez, Rodrigo Mendoza, Robert
 
 ## Tech Stack
 
-Frontend:
+Frontend: HTML, CSS, JavaScript, React
 
-Backend:
+Backend: JavaScript, Node.js
 
 ## Features
 
-### [ filter or sort]
+### [filter or sort]
 
 [The user can filter or sort items based on particular criteria as appropriate for your use case.]
 
@@ -38,9 +38,27 @@ Backend:
 
 [gif goes here]
 
-### [Name of Feature 3]
+### [photo gallery]
 
-[short description goes here]
+[Pictures of the bar, events, and high scorers.]
+
+[gif goes here]
+
+### [happy hour specials]
+
+[Good deals for food and arcade games.]
+
+[gif goes here]
+
+### [tournment registration]
+
+[Sign up for weekly/monthly competitions.]
+
+[gif goes here]
+
+### [customer game rating]
+
+[Customer can rate the arcade games from one to five stars.]
 
 [gif goes here]
 
