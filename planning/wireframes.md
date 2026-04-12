@@ -6,16 +6,16 @@ Reference the Creating an Entity Relationship Diagram final project guide in the
 
 [👉🏾👉🏾👉🏾 List the pages you expect to have in your app, with a ⭐ next to pages you have wireframed]
 
-## Wireframe 1: [page title]
+## Wireframe 1: [⭐ Homepage]
 
-[👉🏾👉🏾👉🏾 include wireframe 1]
+[👉🏾👉🏾👉🏾 <img src="homepage.png">]
 
-## Wireframe 2: [page title]
+## Wireframe 2: [⭐ Play]
 
-[👉🏾👉🏾👉🏾 include wireframe 2]
+[👉🏾👉🏾👉🏾 <img src="play.png">]
 
-## Wireframe 3: [page title]
+## Wireframe 3: [⭐ Events]
 
-[👉🏾👉🏾👉🏾 include wireframe 3]
+[👉🏾👉🏾👉🏾 <img src="events.png">]
 
 [👉🏾👉🏾👉🏾 include more wireframes as desired]
