@@ -4,14 +4,17 @@ Reference the Creating an Entity Relationship Diagram final project guide in the
 
 ## Create the List of Tables
 
-[👉🏾👉🏾👉🏾 List each table in your diagram]
+The tables included in our entity relationship diagram are:
+
+- categories
+- events
+- menu_items
+- games
+- event_games
 
 ## Add the Entity Relationship Diagram
 
-[👉🏾👉🏾👉🏾 Include an image or images of the diagram below. You may also wish to use the following markdown syntax to outline each table, as per your preference.]
+Below is the entity relationship diagram for our app.
 
-| Column Name | Type | Description |
-|-------------|------|-------------|
-| id | integer | primary key |
-| name | text | name of the shoe model |
-| ... | ... | ... |
+<img src="erd1.png"> 
+<img src="erd2.png">
