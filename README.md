@@ -20,7 +20,9 @@ The inspiration for this project came from Leaderboard Arcade, which was mention
 ## Tech Stack
 
 Frontend: HTML, CSS, JavaScript, React
+
 Backend: JavaScript, Node.js
+
 Database: PostgreSQL
 
 ## Features
