@@ -18,12 +18,12 @@ This unit, be sure to complete all tasks listed below. To complete a task, place
 
 ### 1. What went well during this unit?
 
-[👉🏾👉🏾👉🏾 What went well was agreeing on our app idea and created the wireframes and ERD. This helped us better understand how our final project will be built.]
+What went well was agreeing on our app idea and created the wireframes and ERD. This helped us better understand how our final project will be built.
 
 ### 2. What were some challenges your group faced in this unit?
 
-[👉🏾👉🏾👉🏾 Deciding on what features to include without making the project too complicated.]
+Deciding on what features to include without making the project too complicated.
 
 ### 3. What additional support will you need in upcoming units as you continue to work on your final project?
 
-[👉🏾👉🏾👉🏾 Putting our ideas into code and making sure everything works correctly. Also debugging and making sure the pages and features are connected properly.]
+Putting our ideas into code and making sure everything works correctly. Also debugging and making sure the pages and features are connected properly.
