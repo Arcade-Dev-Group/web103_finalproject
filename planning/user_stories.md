@@ -2,9 +2,9 @@
 
 ## Outline User Roles
 
-Customer
+- Customer
 
-Admin
+- Admin
 
 ## Draft User Stories
 
