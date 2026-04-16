@@ -15,7 +15,7 @@ Arcade Bar is a fun social hangout app where guests can explore classic arcade g
 ### Inspiration
 
 The inspiration for this project came from Leaderboard Arcade, which was mentioned to me by a coworker. After visiting, I noticed that it felt different from places like Dave and Buster’s, and that experience gave me the idea to create an app for an arcade bar that feels more local, fun, and unique.
-[LINk](https://leaderboardarcade.com/)
+[LINK](https://leaderboardarcade.com/)
 
 ## Tech Stack
 
