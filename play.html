@@ -14,8 +14,8 @@
 
       <nav aria-label="Main navigation">
         <ul class="nav">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="play.html" class="active">Play</a></li>
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="play.html">Play</a></li>
           <li><a href="menu.html">Menu</a></li>
           <li><a href="events.html">Events</a></li>
           <li><a href="gallery.html">Gallery</a></li>
@@ -23,7 +23,10 @@
         </ul>
       </nav>
 
-      <a class="login-btn" href="login.html">Login</a>
+      <div class="auth-buttons">
+        <a class="login-btn" href="login.html">Login</a>
+        <a class="login-btn" href="signup.html">Sign Up</a>
+      </div>
     </header>
 
     <main id="main-content">
@@ -31,19 +34,52 @@
         <div class="hero-content">
           <p class="hero-tag">Pick your game and start playing.</p>
           <h1>Games</h1>
-          <p class="hero-text">Some of the games you can play here.</p>
+          <p class="hero-text">Filter and sort arcade games by category, name, or rating.</p>
+        </div>
+      </section>
+
+      <section class="container page-section">
+        <div class="games-controls">
+          <h2 class="section-title">Filter and Sort Games</h2>
+
+          <form class="games-filter-form">
+            <div class="filter-group">
+              <label for="game-filter">Filter by category</label>
+              <select id="game-filter" name="game-filter">
+                <option value="all">All Games</option>
+                <option value="classic">Classic</option>
+                <option value="fighting">Fighting</option>
+                <option value="sports">Sports</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="game-sort">Sort by</label>
+              <select id="game-sort" name="game-sort">
+                <option value="default">Featured</option>
+                <option value="name-asc">Name: A to Z</option>
+                <option value="name-desc">Name: Z to A</option>
+                <option value="rating-desc">Highest Rated</option>
+                <option value="rating-asc">Lowest Rated</option>
+              </select>
+            </div>
+
+            <button type="button" class="filter-reset" id="reset-games">Reset</button>
+          </form>
+
+          <p class="filter-results" id="filter-results" aria-live="polite">6 games found</p>
         </div>
       </section>
 
       <section class="container page-section games-section">
         <h2 class="section-title">Game Lineup</h2>
-        <div class="games-grid">
-          <div class="game-card">Pac-Man</div>
-          <div class="game-card">Street Fighter</div>
-          <div class="game-card">Pinball</div>
-          <div class="game-card">Mortal Kombat</div>
-          <div class="game-card">Galaga</div>
-          <div class="game-card">Air Hockey</div>
+        <div class="games-grid" id="games-grid">
+          <div class="game-card" data-category="classic" data-name="Pac-Man" data-rating="5">Pac-Man</div>
+          <div class="game-card" data-category="fighting" data-name="Street Fighter" data-rating="4">Street Fighter</div>
+          <div class="game-card" data-category="classic" data-name="Pinball" data-rating="5">Pinball</div>
+          <div class="game-card" data-category="fighting" data-name="Mortal Kombat" data-rating="5">Mortal Kombat</div>
+          <div class="game-card" data-category="classic" data-name="Galaga" data-rating="4">Galaga</div>
+          <div class="game-card" data-category="sports" data-name="Air Hockey" data-rating="4">Air Hockey</div>
         </div>
       </section>
     </main>
