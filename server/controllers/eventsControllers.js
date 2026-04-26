@@ -1,25 +1,26 @@
-import { pool } from '../config/database.js';
+import { pool } from '../config/database.js'
 
 
 // GET /api/events
 const getAllEvents = async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM events ORDER BY event_date ASC');
-    res.json(result.rows);
+    const result = await pool.query('SELECT * FROM events ORDER BY event_date ASC')
+    res.json(result.rows)
   } catch (err) {
-    res.status(500).json({ error: 'Error fetching events' });
+    res.status(500).json({ error: 'Error fetching events' })
   }
-};
+}
 
 
 // create a new event
 
 
 
-// GET /api/events/:id
+
+
 const getEventById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params
     const [eventQuery, gamesQuery] = await Promise.all([
       pool.query('SELECT * FROM events WHERE id = $1', [id]),
       pool.query(`
@@ -35,9 +36,9 @@ const getEventById = async (req, res) => {
       games: gamesQuery.rows
     })
   } catch (err) {
-    res.status(500).json({ error: 'Error fetching event details' });
+    res.status(500).json({ error: 'Error fetching event details' })
   }
-};
+}
 
 
-export { getAllEvents, getEventById };
+export { getAllEvents, getEventById }
