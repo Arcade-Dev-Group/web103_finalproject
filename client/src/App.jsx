@@ -5,7 +5,6 @@ import Play from "./pages/Play";
 import GameDetail from "./pages/GameDetail";
 import Menu from "./pages/Menu";
 import Events from "./pages/Events";
-import Gallery from "./pages/Gallery";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -17,7 +16,6 @@ function App() {
     { path: "/games/:id", element: <GameDetail /> },
     { path: "/menu", element: <Menu /> },
     { path: "/events", element: <Events /> },
-    { path: "/gallery", element: <Gallery /> },
     { path: "/contact", element: <Contact /> },
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <Signup /> },

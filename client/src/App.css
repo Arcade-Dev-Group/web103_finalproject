@@ -177,13 +177,6 @@ select:focus-visible {
   background-position: center;
 }
 
-.gallery-hero {
-  background: linear-gradient(rgba(15, 15, 26, 0.75), rgba(15, 15, 26, 0.75)),
-    url("https://images.unsplash.com/photo-1648672967189-1ead89a74bc6?w=600&auto=format&fit=crop&q=60");
-  background-size: cover;
-  background-position: center;
-}
-
 .contact-hero {
   background: linear-gradient(rgba(15, 15, 26, 0.75), rgba(15, 15, 26, 0.75)),
     url("https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&auto=format&fit=crop&q=60");
