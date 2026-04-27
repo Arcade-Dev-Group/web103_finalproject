@@ -88,7 +88,7 @@ async function createGameScoresTable() {
     CREATE TABLE game_scores (
       id          SERIAL PRIMARY KEY,
       player_name VARCHAR(150) NOT NULL,
-      game_name   VARCHAR(100) NOT NULL,
+      game_id     INT NOT NULL REFERENCES arcade_games(id) ON DELETE CASCADE,
       score       INT NOT NULL CHECK (score >= 0),
       created_at  TIMESTAMPTZ DEFAULT NOW()
     );
