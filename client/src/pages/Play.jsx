@@ -3,15 +3,16 @@ import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-function Play() {
+function Play({ api_url }) {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all");
   const [sort, setSort] = useState("default");
+  const apiBase = api_url || "";
 
   useEffect(() => {
-    fetch("/api/games")
+    fetch(`${apiBase}/api/games`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load games");
         return res.json();
@@ -19,7 +20,7 @@ function Play() {
       .then((data) => setGames(data))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [apiBase]);
 
   const genres = useMemo(() => [...new Set(games.map((g) => g.genre?.toLowerCase()).filter(Boolean))], [games]);
 
