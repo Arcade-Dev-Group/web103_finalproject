@@ -24,6 +24,83 @@
             text-align: center;
         }
         h1 { color: yellow; text-shadow: 2px 2px red; }
+        .overlay {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 20;
+        }
+        .overlay.show {
+            display: flex;
+        }
+        .game-over-card {
+            width: min(92vw, 420px);
+            background: #191919;
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+        .game-over-card h2 {
+            margin: 0 0 8px;
+            color: #ffd700;
+        }
+        .game-over-card p {
+            margin: 10px 0;
+        }
+        .name-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #0f0f0f;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .actions button {
+            flex: 1;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .secondary-action {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #3a3a3a;
+            color: #fff;
+        }
+        .save-btn {
+            background: #ffd700;
+            color: #111;
+        }
+        .restart-btn {
+            background: #2c8cff;
+            color: #fff;
+        }
+        .save-status {
+            min-height: 20px;
+            margin-top: 8px;
+            color: #8ddf8d;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -34,13 +111,108 @@
     </div>
     <canvas id="gameCanvas" width="380" height="420"></canvas>
 
+    <div id="game-over-overlay" class="overlay" aria-hidden="true">
+        <div class="game-over-card" role="dialog" aria-labelledby="game-over-title">
+            <h2 id="game-over-title">Game Over</h2>
+            <p>Final Score: <strong id="final-score">0</strong></p>
+            <input id="player-name" class="name-input" type="text" maxlength="40" placeholder="Enter your name" />
+            <div class="actions">
+                <button id="save-score-btn" class="save-btn" type="button">Save Score</button>
+                <button id="restart-btn" class="restart-btn" type="button">Play Again</button>
+            </div>
+            <button id="return-games-btn" class="secondary-action" type="button">Return to Games</button>
+            <p id="save-status" class="save-status"></p>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
         const scoreElement = document.getElementById("score");
+        const overlay = document.getElementById("game-over-overlay");
+        const finalScoreElement = document.getElementById("final-score");
+        const playerNameInput = document.getElementById("player-name");
+        const saveScoreButton = document.getElementById("save-score-btn");
+        const restartButton = document.getElementById("restart-btn");
+        const returnGamesButton = document.getElementById("return-games-btn");
+        const saveStatus = document.getElementById("save-status");
 
         const TILE_SIZE = 20;
         let score = 0;
+        let isGameOver = false;
+        let hasSavedScore = false;
+        const API_BASE = window.location.hostname === "localhost"
+            ? "http://localhost:3000"
+            : "https://server-x77u.onrender.com";
+
+        async function saveScore(playerName, finalScore) {
+            try {
+                const response = await fetch(`${API_BASE}/api/scores`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        player_name: playerName,
+                        game_name: "Pac-Man",
+                        score: finalScore
+                    })
+                });
+                return response.ok;
+            } catch (_err) {
+                return false;
+            }
+        }
+
+        function openGameOverPanel() {
+            finalScoreElement.textContent = String(score);
+            const storedName = localStorage.getItem("arcade_player_name") || "";
+            playerNameInput.value = storedName;
+            saveStatus.textContent = "";
+            overlay.classList.add("show");
+            overlay.setAttribute("aria-hidden", "false");
+            setTimeout(() => playerNameInput.focus(), 0);
+        }
+
+        async function handleSaveScore() {
+            if (hasSavedScore) {
+                saveStatus.textContent = "Score already saved.";
+                return;
+            }
+
+            const playerName = (playerNameInput.value || "Guest").trim() || "Guest";
+            localStorage.setItem("arcade_player_name", playerName);
+
+            saveScoreButton.disabled = true;
+            saveStatus.textContent = "Saving...";
+
+            const ok = await saveScore(playerName, score);
+            if (ok) {
+                hasSavedScore = true;
+                saveStatus.textContent = `Saved for ${playerName}!`;
+                return;
+            }
+
+            saveStatus.textContent = "Could not save score. Try again.";
+            saveScoreButton.disabled = false;
+        }
+
+        function endGame() {
+            if (isGameOver) return;
+            isGameOver = true;
+            openGameOverPanel();
+        }
+
+        saveScoreButton.addEventListener("click", handleSaveScore);
+        restartButton.addEventListener("click", () => {
+            window.location.reload();
+        });
+        returnGamesButton.addEventListener("click", () => {
+            window.location.href = "/play";
+        });
+        playerNameInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") handleSaveScore();
+        });
 
         // 1 = Wall, 0 = Dot, 2 = Empty, 3 = Pacman Start
         const map = [
@@ -177,8 +349,8 @@
 
                 // Check collision with Pacman
                 if (g.x === pacman.x && g.y === pacman.y) {
-                    alert("GAME OVER! Your score: " + score);
-                    location.reload();
+                    endGame();
+                    return;
                 }
             });
         }
@@ -191,6 +363,8 @@
         });
 
         function gameLoop() {
+            if (isGameOver) return;
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             movePacman();
