@@ -9,16 +9,19 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 
+
+const API_URL = import.meta.env.PROD ? 'https://server-x77u.onrender.com' : '';
+
 function App() {
   const routes = useRoutes([
-    { path: "/", element: <Home /> },
-    { path: "/play", element: <Play /> },
-    { path: "/games/:id", element: <GameDetail /> },
-    { path: "/menu", element: <Menu /> },
-    { path: "/events", element: <Events /> },
-    { path: "/contact", element: <Contact /> },
-    { path: "/login", element: <Login /> },
-    { path: "/signup", element: <Signup /> },
+    { path: "/", element: <Home  api_url={API_URL}/> },
+    { path: "/play", element: <Play  api_url={API_URL}/> },
+    { path: "/games/:id", element: <GameDetail api_url={API_URL}/> },
+    { path: "/menu", element: <Menu  api_url={API_URL}/> },
+    { path: "/events", element: <Events  api_url={API_URL}/> },
+    { path: "/contact", element: <Contact  api_url={API_URL}/> },
+    { path: "/login", element: <Login  api_url={API_URL}/> },
+    { path: "/signup", element: <Signup api_url={API_URL}/> },
   ]);
 
   return routes;
