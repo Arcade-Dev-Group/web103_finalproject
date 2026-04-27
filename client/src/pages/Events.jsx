@@ -28,7 +28,7 @@ function formatTime(timeStr) {
   return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
-function RegisterModal({ event, onClose, onSuccess }) {
+function RegisterModal({ event, onClose, onSuccess, apiBase }) {
   const [form, setForm] = useState({ name: "", email: "" });
   const [status, setStatus] = useState("idle");
   const [message, setMessage] = useState("");
@@ -37,7 +37,7 @@ function RegisterModal({ event, onClose, onSuccess }) {
     e.preventDefault();
     setStatus("loading");
     try {
-      const res = await fetch(`/api/events/${event.id}/register`, {
+      const res = await fetch(`${apiBase}/api/events/${event.id}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -120,15 +120,16 @@ function RegisterModal({ event, onClose, onSuccess }) {
   );
 }
 
-function Events() {
+function Events({ api_url }) {
   const [events, setEvents] = useState([]);
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const apiBase = api_url || "";
 
   useEffect(() => {
-    fetch("/api/events")
+    fetch(`${apiBase}/api/events`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load events");
         return res.json();
@@ -137,7 +138,7 @@ function Events() {
         setEvents(data);
         return Promise.all(
           data.map((e) =>
-            fetch(`/api/events/${e.id}/registrations/count`)
+            fetch(`${apiBase}/api/events/${e.id}/registrations/count`)
               .then((r) => r.json())
               .then((c) => ({ id: e.id, count: c.count }))
           )
@@ -226,6 +227,7 @@ function Events() {
       {selectedEvent && (
         <RegisterModal
           event={selectedEvent}
+          apiBase={apiBase}
           onClose={() => setSelectedEvent(null)}
           onSuccess={handleRegistrationSuccess}
         />

@@ -3,14 +3,15 @@ import { useParams, Link } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-function GameDetail() {
+function GameDetail({ api_url }) {
   const { id } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const apiBase = api_url || "";
 
   useEffect(() => {
-    fetch(`/api/games/${id}`)
+    fetch(`${apiBase}/api/games/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Game not found");
         return res.json();
