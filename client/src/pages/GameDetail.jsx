@@ -43,6 +43,14 @@ function GameDetail({ api_url }) {
                   <p className="game-detail-desc">{game.description}</p>
                 )}
                 <div className="game-detail-meta">
+                  <a
+                      href={game.play_url}
+                      className="play-btn"
+                      // target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Play Now
+                    </a>
                   <span className="game-card-players">
                     {game.players === 1 ? "1 Player" : `${game.players} Players`}
                   </span>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classic Pac-Man 1980</title>
+    <style>
+        body {
+            background-color: #111;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        canvas {
+            border: 5px solid #222;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background-color: black;
+        }
+        #ui {
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        h1 { color: yellow; text-shadow: 2px 2px red; }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <h1>PAC-MAN</h1>
+        <h2>Score: <span id="score">0</span></h2>
+    </div>
+    <canvas id="gameCanvas" width="380" height="420"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreElement = document.getElementById("score");
+
+        const TILE_SIZE = 20;
+        let score = 0;
+
+        // 1 = Wall, 0 = Dot, 2 = Empty, 3 = Pacman Start
+        const map = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,1,1,1,0,1,0,1,1,0,0,1],
+            [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
+            [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
+            [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
+            [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
+            [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        ];
+
+        let pacman = {
+            x: 1, y: 1, 
+            dirX: 0, dirY: 0, 
+            nextDirX: 0, nextDirY: 0,
+            anim: 0
+        };
+
+        let ghosts = [
+            { x: 9, y: 9, color: "red", dirX: 1, dirY: 0 },
+            { x: 8, y: 9, color: "pink", dirX: -1, dirY: 0 },
+            { x: 10, y: 9, color: "cyan", dirX: 0, dirY: -1 },
+            { x: 9, y: 10, color: "orange", dirX: 0, dirY: 1 },
+        ];
+
+        function drawMap() {
+            for (let row = 0; row < map.length; row++) {
+                for (let col = 0; col < map[row].length; col++) {
+                    let tile = map[row][col];
+                    if (tile === 1) {
+                        ctx.fillStyle = "blue";
+                        ctx.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                    } else if (tile === 0) {
+                        ctx.fillStyle = "white";
+                        ctx.beginPath();
+                        ctx.arc(col * TILE_SIZE + TILE_SIZE/2, row * TILE_SIZE + TILE_SIZE/2, 2, 0, Math.PI*2);
+                        ctx.fill();
+                    }
+                }
+            }
+        }
+
+        function drawPacman() {
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            let centerX = pacman.x * TILE_SIZE + TILE_SIZE/2;
+            let centerY = pacman.y * TILE_SIZE + TILE_SIZE/2;
+            
+            // Mouth animation
+            let mouthOpen = Math.sin(pacman.anim) * 0.2 + 0.2;
+            let rotation = 0;
+            if (pacman.dirX === 1) rotation = 0;
+            if (pacman.dirX === -1) rotation = Math.PI;
+            if (pacman.dirY === -1) rotation = -Math.PI/2;
+            if (pacman.dirY === 1) rotation = Math.PI/2;
+
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, TILE_SIZE/2 - 2, rotation + mouthOpen, rotation + (2 * Math.PI) - mouthOpen);
+            ctx.fill();
+        }
+
+        function drawGhosts() {
+            ghosts.forEach(g => {
+                ctx.fillStyle = g.color;
+                ctx.beginPath();
+                ctx.arc(g.x * TILE_SIZE + TILE_SIZE/2, g.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/2 - 2, Math.PI, 0);
+                ctx.lineTo(g.x * TILE_SIZE + TILE_SIZE - 2, g.y * TILE_SIZE + TILE_SIZE - 2);
+                ctx.lineTo(g.x * TILE_SIZE + 2, g.y * TILE_SIZE + TILE_SIZE - 2);
+                ctx.fill();
+                
+                // Eyes
+                ctx.fillStyle = "white";
+                ctx.beginPath();
+                ctx.arc(g.x * TILE_SIZE + 6, g.y * TILE_SIZE + 7, 2, 0, Math.PI*2);
+                ctx.arc(g.x * TILE_SIZE + 14, g.y * TILE_SIZE + 7, 2, 0, Math.PI*2);
+                ctx.fill();
+            });
+        }
+
+        function movePacman() {
+            pacman.anim += 0.3;
+            
+            // Try to change to the requested direction
+            if (pacman.nextDirX !== 0 || pacman.nextDirY !== 0) {
+                if (map[pacman.y + pacman.nextDirY]?.[pacman.x + pacman.nextDirX] !== 1) {
+                    pacman.dirX = pacman.nextDirX;
+                    pacman.dirY = pacman.nextDirY;
+                    pacman.nextDirX = 0;
+                    pacman.nextDirY = 0;
+                }
+            }
+
+            // Move in current direction
+            if (map[pacman.y + pacman.dirY]?.[pacman.x + pacman.dirX] !== 1) {
+                pacman.x += pacman.dirX;
+                pacman.y += pacman.dirY;
+            }
+
+            // Eat dot
+            if (map[pacman.y][pacman.x] === 0) {
+                map[pacman.y][pacman.x] = 2;
+                score += 10;
+                scoreElement.innerText = score;
+            }
+        }
+
+        function moveGhosts() {
+            ghosts.forEach(g => {
+                // If ghost hits a wall or randomly decides to turn
+                if (map[g.y + g.dirY]?.[g.x + g.dirX] === 1 || Math.random() < 0.05) {
+                    const dirs = [{x:1,y:0}, {x:-1,y:0}, {x:0,y:1}, {x:0,y:-1}];
+                    let newDir = dirs[Math.floor(Math.random() * 4)];
+                    if (map[g.y + newDir.y]?.[g.x + newDir.x] !== 1) {
+                        g.dirX = newDir.x;
+                        g.dirY = newDir.y;
+                    }
+                }
+                
+                if (map[g.y + g.dirY]?.[g.x + g.dirX] !== 1) {
+                    g.x += g.dirX;
+                    g.y += g.dirY;
+                }
+
+                // Check collision with Pacman
+                if (g.x === pacman.x && g.y === pacman.y) {
+                    alert("GAME OVER! Your score: " + score);
+                    location.reload();
+                }
+            });
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp") { pacman.nextDirX = 0; pacman.nextDirY = -1; }
+            if (e.key === "ArrowDown") { pacman.nextDirX = 0; pacman.nextDirY = 1; }
+            if (e.key === "ArrowLeft") { pacman.nextDirX = -1; pacman.nextDirY = 0; }
+            if (e.key === "ArrowRight") { pacman.nextDirX = 1; pacman.nextDirY = 0; }
+        });
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            movePacman();
+            moveGhosts();
+            
+            drawMap();
+            drawPacman();
+            drawGhosts();
+            
+            setTimeout(gameLoop, 150); // Controls game speed
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
