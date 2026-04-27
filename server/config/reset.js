@@ -4,6 +4,7 @@ import { pool } from '../config/database.js'
 
 async function dropTables() {
   await pool.query(`
+    DROP TABLE IF EXISTS game_scores CASCADE;
     DROP TABLE IF EXISTS registrations CASCADE;
     DROP TABLE IF EXISTS events CASCADE;
     DROP TABLE IF EXISTS drinks CASCADE;
@@ -22,7 +23,8 @@ async function createArcadeGamesTable() {
       players     INT DEFAULT 1,
       description TEXT,
       rating      NUMERIC(3,1) CHECK (rating >= 0 AND rating <= 10),
-      image_url   TEXT
+      image_url   TEXT,
+      play_url    TEXT
     );
   `)
   console.log('arcade_games table created.')
@@ -81,14 +83,27 @@ async function createRegistrationsTable() {
   console.log('registrations table created.')
 }
 
+async function createGameScoresTable() {
+  await pool.query(`
+    CREATE TABLE game_scores (
+      id          SERIAL PRIMARY KEY,
+      player_name VARCHAR(150) NOT NULL,
+      game_name   VARCHAR(100) NOT NULL,
+      score       INT NOT NULL CHECK (score >= 0),
+      created_at  TIMESTAMPTZ DEFAULT NOW()
+    );
+  `)
+  console.log('game_scores table created.')
+}
+
 
 async function seedArcadeGames() {
   await pool.query(`
-    INSERT INTO arcade_games (name, genre, players, description, image_url, rating) VALUES
-      ('Tetris',           'Puzzle',  1, 'Stack falling blocks and clear lines as fast as you can.',    'https://upload.wikimedia.org/wikipedia/commons/9/9c/Typical_Tetris_Game.svg',      9.5),
-      ('Pac-Man',          'Classic', 1, 'Navigate mazes and eat pellets while avoiding ghosts.',        'https://blog.sciencemuseum.org.uk/wp-content/uploads/sites/12/2017/10/Pacman.gif',  9.2),
-      ('Mortal Kombat II', 'Fighting',2, 'Brutal fighting game with fatalities and iconic characters.', 'https://upload.wikimedia.org/wikipedia/en/thumb/5/50/Mortal_Kombat_II_Poster_2026.jpg/250px-Mortal_Kombat_II_Poster_2026.jpg',9.0),
-      ('Street Fighter',   'Fighting',2, 'Head-to-head fighting game with iconic characters.',           'https://cdn11.bigcommerce.com/s-yzgoj/images/stencil/500x659/products/3228749/6215112/XPE160541__37798.1709700114.jpg?c=2',      8.8);
+    INSERT INTO arcade_games (name, genre, players, description, image_url, rating, play_url) VALUES
+      ('Tetris',           'Puzzle',  1, 'Stack falling blocks and clear lines as fast as you can.',    'https://upload.wikimedia.org/wikipedia/commons/9/9c/Typical_Tetris_Game.svg',      9.5, '/games/tetris/index.html'),
+      ('Pac-Man',          'Classic', 1, 'Navigate mazes and eat pellets while avoiding ghosts.',        'https://blog.sciencemuseum.org.uk/wp-content/uploads/sites/12/2017/10/Pacman.gif',  9.2, '/games/pacman/index.html'),
+      ('Mortal Kombat II', 'Fighting',2, 'Brutal fighting game with fatalities and iconic characters.', 'https://upload.wikimedia.org/wikipedia/en/thumb/5/50/Mortal_Kombat_II_Poster_2026.jpg/250px-Mortal_Kombat_II_Poster_2026.jpg',9.0, '/games/mortal-kombat-ii/index.html'),
+      ('Street Fighter',   'Fighting',2, 'Head-to-head fighting game with iconic characters.',           'https://cdn11.bigcommerce.com/s-yzgoj/images/stencil/500x659/products/3228749/6215112/XPE160541__37798.1709700114.jpg?c=2',      8.8, '/games/street-fighter/index.html');
   `)
   console.log('arcade_games seeded.')
 }
@@ -145,6 +160,7 @@ const runReset = async () => {
         await createFoodTable()
         await createDrinksTable()
         await createRegistrationsTable()
+    await createGameScoresTable()
         await seedArcadeGames()
         await seedEvents()
         await seedFood()

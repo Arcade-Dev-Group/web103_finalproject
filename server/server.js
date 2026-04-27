@@ -6,6 +6,7 @@ import './config/dotenv.js'
 import menuRoutes from './routes/menuRoutes.js'
 import gamesRoutes from './routes/gamesRoutes.js'
 import eventRoutes from './routes/eventRoutes.js'
+import scoresRoutes from './routes/scoresRoutes.js'
 
 
 const app = express()
@@ -16,6 +17,7 @@ app.use(cors())
 app.use('/api/menu', menuRoutes)
 app.use('/api/games', gamesRoutes)
 app.use('/api/events', eventRoutes)
+app.use('/api/scores', scoresRoutes)
 
 app.get('/', (req, res) => {
     res.status(200).send('<h1 style="text-align: center; margin-top: 50px;">Arcade Bar API</h1>')
