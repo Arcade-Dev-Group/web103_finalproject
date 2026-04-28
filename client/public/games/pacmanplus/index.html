@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pac-Man Plus - Fixed</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            background-color: #111;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.2);
+            border: 4px solid #222;
+            border-radius: 4px;
+        }
+
+        canvas {
+            display: block;
+            background-color: #000;
+        }
+
+        #ui-layer {
+            width: 440px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 16px;
+            color: #dedede;
+            text-transform: uppercase;
+        }
+
+        .score-box span {
+            color: #ffeb3b;
+        }
+
+        #start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #ffeb3b;
+            text-shadow: 4px 4px #b71c1c;
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background: #ffeb3b;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            cursor: pointer;
+            color: #000;
+            box-shadow: 0 4px 0 #f57f17;
+            transition: transform 0.1s;
+        }
+
+        button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #f57f17;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .game-over-panel {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 20;
+        }
+        .game-over-card {
+            width: min(92vw, 420px);
+            background: #191919;
+            border: 2px solid #ffeb3b;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .game-over-card h2 {
+            margin: 0 0 8px;
+            color: #ffeb3b;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+        }
+        .game-over-card p {
+            margin: 10px 0;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .name-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #0f0f0f;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .actions button {
+            flex: 1;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            box-shadow: none;
+            text-transform: none;
+        }
+        .save-btn {
+            background: #ffeb3b;
+            color: #111;
+        }
+        .restart-btn {
+            background: #2c8cff;
+            color: #fff;
+        }
+        .secondary-action {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #3a3a3a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            box-shadow: none;
+            text-transform: none;
+        }
+        .save-status {
+            min-height: 20px;
+            margin-top: 8px;
+            color: #8ddf8d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-layer" style="width: 440px;">
+        <div class="score-box">SCORE: <span id="scoreEl">0</span></div>
+        <div class="lives-box">LIVES: <span id="livesEl">3</span></div>
+    </div>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="440" height="520"></canvas>
+        <div class="scanlines"></div>
+        
+        <div id="start-screen">
+            <h1>PAC-MAN</h1>
+            <p style="margin-bottom: 20px; font-size: 10px; color: #aaa;">USE ARROW KEYS TO MOVE</p>
+            <button id="startBtn">INSERT COIN</button>
+        </div>
+        
+        <div id="game-over-screen" class="game-over-panel hidden" aria-hidden="true">
+            <div class="game-over-card" role="dialog" aria-labelledby="game-over-title">
+                <h2 id="game-over-title">Game Over</h2>
+                <p>Final Score: <strong id="final-score">0</strong></p>
+                <input id="player-name" class="name-input" type="text" maxlength="40" placeholder="Enter your name" />
+                <div class="actions">
+                    <button id="save-score-btn" class="save-btn" type="button">Save Score</button>
+                    <button id="restartBtn" class="restart-btn" type="button">Play Again</button>
+                </div>
+                <button id="return-games-btn" class="secondary-action" type="button">Return to Games</button>
+                <p id="save-status" class="save-status"></p>
+            </div>
+        </div>
+    </div>
+
+<script>
+/**
+ * PAC-MAN CLONE ENGINE
+ * ---------------------
+ */
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('scoreEl');
+const livesEl = document.getElementById('livesEl');
+const startScreen = document.getElementById('start-screen');
+const gameOverScreen = document.getElementById('game-over-screen');
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const finalScoreElement = document.getElementById('final-score');
+const playerNameInput = document.getElementById('player-name');
+const saveScoreButton = document.getElementById('save-score-btn');
+const returnGamesButton = document.getElementById('return-games-btn');
+const saveStatus = document.getElementById('save-status');
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://server-x77u.onrender.com';
+
+// Game Constants
+const TILE_SIZE = 20;
+const ROWS = 26; 
+const COLS = 22; 
+const PACMAN_SPEED = 2; 
+const GHOST_SPEED = 2;
+
+// 1 = Wall, 0 = Dot, 2 = Empty, 3 = Power Pellet, 4 = Ghost House
+const mapLayout = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+    [1,3,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,3,1],
+    [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,1,0,1],
+    [1,0,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,1,0,1],
+    [1,0,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,1],
+    [1,1,1,1,1,0,1,1,1,2,1,1,2,1,1,1,0,1,1,1,1,1],
+    [1,1,1,1,1,0,1,1,2,2,2,2,2,2,1,1,0,1,1,1,1,1],
+    [1,1,1,1,1,0,1,1,2,1,1,1,1,2,1,1,0,1,1,1,1,1],
+    [1,1,1,1,1,0,1,1,2,1,4,4,1,2,1,1,0,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,2,1,4,4,1,2,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,0,1,1,2,1,1,1,1,2,1,1,0,1,1,1,1,1],
+    [1,1,1,1,1,0,1,1,2,2,2,2,2,2,1,1,0,1,1,1,1,1],
+    [1,1,1,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+    [1,0,1,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,1,0,1],
+    [1,3,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,3,1],
+    [1,1,1,0,1,0,1,1,0,1,1,1,1,0,1,1,0,1,0,1,1,1],
+    [1,1,1,0,1,0,1,1,0,1,1,1,1,0,1,1,0,1,0,1,1,1],
+    [1,0,0,0,0,0,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0,1],
+    [1,0,1,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+// Directions
+const UP = { x: 0, y: -1 };
+const DOWN = { x: 0, y: 1 };
+const LEFT = { x: -1, y: 0 };
+const RIGHT = { x: 1, y: 0 };
+const STOP = { x: 0, y: 0 };
+
+// Game State
+let score = 0;
+let lives = 3;
+let gameActive = false;
+let animationId;
+let pellets = [];
+let walls = [];
+let powerPellets = [];
+let frameCount = 0;
+let hasSavedScore = false;
+
+async function saveScore(playerName, finalScore) {
+    try {
+        const response = await fetch(`${API_BASE}/api/scores`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                player_name: playerName,
+                game_name: 'Pac-Man Plus',
+                score: finalScore
+            })
+        });
+        return response.ok;
+    } catch (_err) {
+        return false;
+    }
+}
+
+function openGameOverPanel() {
+    finalScoreElement.textContent = String(score);
+    const storedName = localStorage.getItem('arcade_player_name') || '';
+    playerNameInput.value = storedName;
+    saveStatus.textContent = '';
+    saveScoreButton.disabled = false;
+    gameOverScreen.classList.remove('hidden');
+    gameOverScreen.setAttribute('aria-hidden', 'false');
+    setTimeout(() => playerNameInput.focus(), 0);
+}
+
+async function handleSaveScore() {
+    if (hasSavedScore) {
+        saveStatus.textContent = 'Score already saved.';
+        return;
+    }
+
+    const playerName = (playerNameInput.value || 'Guest').trim() || 'Guest';
+    localStorage.setItem('arcade_player_name', playerName);
+
+    saveScoreButton.disabled = true;
+    saveStatus.textContent = 'Saving...';
+
+    const ok = await saveScore(playerName, score);
+    if (ok) {
+        hasSavedScore = true;
+        saveStatus.textContent = `Saved for ${playerName}!`;
+        return;
+    }
+
+    saveStatus.textContent = 'Could not save score. Try again.';
+    saveScoreButton.disabled = false;
+}
+
+// Entities
+let pacman;
+let ghosts = [];
+
+// --- CLASSES ---
+
+class Entity {
+    constructor(x, y, speed) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.dir = STOP;
+        this.nextDir = STOP;
+        this.radius = TILE_SIZE / 2 - 2;
+    }
+
+    getGridPos() {
+        return {
+            col: Math.floor((this.x + TILE_SIZE / 2) / TILE_SIZE),
+            row: Math.floor((this.y + TILE_SIZE / 2) / TILE_SIZE)
+        };
+    }
+
+    isCentered() {
+        // Must be exactly on a grid line to turn
+        return (this.x % TILE_SIZE === 0) && (this.y % TILE_SIZE === 0);
+    }
+
+    canMove(direction) {
+        const gp = this.getGridPos();
+        const nextRow = gp.row + direction.y;
+        const nextCol = gp.col + direction.x;
+        
+        if (nextRow < 0 || nextRow >= ROWS || nextCol < 0 || nextCol >= COLS) return false;
+        
+        const tile = mapLayout[nextRow][nextCol];
+        return tile !== 1 && tile !== 4; 
+    }
+    
+    handleTunnel() {
+        if (this.x < -TILE_SIZE/2) this.x = canvas.width + TILE_SIZE/2;
+        if (this.x > canvas.width + TILE_SIZE/2) this.x = -TILE_SIZE/2;
+    }
+}
+
+class Pacman extends Entity {
+    constructor(x, y) {
+        super(x, y, PACMAN_SPEED);
+        this.mouthOpen = 0;
+        this.mouthSpeed = 0.2;
+    }
+
+    update() {
+        if (this.dir !== STOP) {
+            this.mouthOpen += this.mouthSpeed;
+            if (this.mouthOpen > 0.2 * Math.PI || this.mouthOpen < 0) {
+                this.mouthSpeed = -this.mouthSpeed;
+            }
+        }
+
+        if (this.isCentered()) {
+            if (this.nextDir !== STOP && this.canMove(this.nextDir)) {
+                this.dir = this.nextDir;
+                this.nextDir = STOP;
+            }
+            
+            if (!this.canMove(this.dir)) {
+                this.dir = STOP;
+            }
+        }
+
+        this.x += this.dir.x * this.speed;
+        this.y += this.dir.y * this.speed;
+        
+        this.handleTunnel();
+        this.checkCollisions();
+    }
+
+    draw() {
+        ctx.save();
+        ctx.translate(this.x + TILE_SIZE/2, this.y + TILE_SIZE/2);
+        
+        let angle = 0;
+        if (this.dir === DOWN) angle = Math.PI / 2;
+        if (this.dir === LEFT) angle = Math.PI;
+        if (this.dir === UP) angle = -Math.PI / 2;
+        ctx.rotate(angle);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0.2 * Math.PI - this.mouthOpen, 1.8 * Math.PI + this.mouthOpen);
+        ctx.lineTo(0, 0);
+        ctx.fillStyle = '#ffeb3b';
+        ctx.fill();
+        ctx.restore();
+    }
+
+    checkCollisions() {
+        const gp = this.getGridPos();
+        
+        const dotIndex = pellets.findIndex(p => p.col === gp.col && p.row === gp.row);
+        if (dotIndex !== -1) {
+            pellets.splice(dotIndex, 1);
+            score += 10;
+            scoreEl.innerText = score;
+            checkWin();
+        }
+
+        const powerIndex = powerPellets.findIndex(p => p.col === gp.col && p.row === gp.row);
+        if (powerIndex !== -1) {
+            powerPellets.splice(powerIndex, 1);
+            score += 50;
+            scoreEl.innerText = score;
+            makeGhostsVulnerable();
+        }
+    }
+}
+
+class Ghost extends Entity {
+    constructor(x, y, color, type) {
+        super(x, y, GHOST_SPEED);
+        this.color = color;
+        this.originalColor = color;
+        this.isVulnerable = false;
+        this.isDead = false;
+        this.type = type;
+        this.dir = [LEFT, RIGHT][Math.floor(Math.random()*2)];
+    }
+
+    update() {
+        if (this.isCentered()) {
+            const options = [];
+            const dirs = [UP, DOWN, LEFT, RIGHT];
+            
+            dirs.forEach(d => {
+                if (d.x === -this.dir.x && d.y === -this.dir.y && !this.isDead) return;
+                
+                if (this.canMove(d)) {
+                    const gp = this.getGridPos();
+                    const nextRow = gp.row + d.y;
+                    const nextCol = gp.col + d.x;
+                    const nextTile = mapLayout[nextRow][nextCol];
+                    
+                    if (this.isDead || nextTile !== 4) {
+                        options.push(d);
+                    }
+                }
+            });
+
+            if (options.length > 0) {
+                if (Math.random() < 0.2 && !this.isVulnerable && !this.isDead) {
+                    const targetDir = options.sort((a, b) => {
+                        const distA = Math.hypot((this.x + a.x*TILE_SIZE) - pacman.x, (this.y + a.y*TILE_SIZE) - pacman.y);
+                        const distB = Math.hypot((this.x + b.x*TILE_SIZE) - pacman.x, (this.y + b.y*TILE_SIZE) - pacman.y);
+                        return distA - distB;
+                    })[0];
+                    this.dir = targetDir;
+                } else {
+                    this.dir = options[Math.floor(Math.random() * options.length)];
+                }
+            } else {
+                this.dir = { x: -this.dir.x, y: -this.dir.y };
+            }
+        }
+
+        this.x += this.dir.x * this.speed;
+        this.y += this.dir.y * this.speed;
+        this.handleTunnel();
+    }
+
+    draw() {
+        const cx = this.x + TILE_SIZE/2;
+        const cy = this.y + TILE_SIZE/2;
+        
+        ctx.fillStyle = this.isVulnerable ? (frameCount % 20 < 10 ? '#0000ff' : '#ffffff') : this.color;
+        if (this.isDead) ctx.fillStyle = 'transparent';
+
+        ctx.beginPath();
+        ctx.arc(cx, cy - 2, this.radius, Math.PI, 0);
+        ctx.lineTo(cx + this.radius, cy + this.radius);
+        for(let i=1; i<=3; i++) {
+            ctx.lineTo(cx + this.radius - (2*this.radius/3)*i, cy + this.radius - (i%2==0?0:3));
+        }
+        ctx.lineTo(cx - this.radius, cy + this.radius);
+        ctx.fill();
+
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(cx - 4, cy - 4, 3, 0, Math.PI * 2);
+        ctx.arc(cx + 4, cy - 4, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = 'blue';
+        ctx.beginPath();
+        ctx.arc(cx - 4 + this.dir.x*2, cy - 4 + this.dir.y*2, 1.5, 0, Math.PI * 2);
+        ctx.arc(cx + 4 + this.dir.x*2, cy - 4 + this.dir.y*2, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+// --- GAME FUNCTIONS ---
+
+function initGame() {
+    score = 0;
+    lives = 3;
+    hasSavedScore = false;
+    scoreEl.innerText = score;
+    livesEl.innerText = lives;
+    resetLevel();
+    gameActive = true;
+    startScreen.classList.add('hidden');
+    gameOverScreen.classList.add('hidden');
+    gameOverScreen.setAttribute('aria-hidden', 'true');
+    animate();
+}
+
+function resetLevel() {
+    // FIXED: Aligned to grid integers and valid path (Row 15, Col 10 is empty space)
+    pacman = new Pacman(10 * TILE_SIZE, 15 * TILE_SIZE); 
+    
+    // FIXED: Ghosts aligned to grid inside ghost house
+    ghosts = [
+        new Ghost(10 * TILE_SIZE, 13 * TILE_SIZE, '#ff0000', 0), 
+        new Ghost(9 * TILE_SIZE, 13 * TILE_SIZE, '#ffb8ff', 1), 
+        new Ghost(10 * TILE_SIZE, 13 * TILE_SIZE, '#00ffff', 2), 
+        new Ghost(11 * TILE_SIZE, 13 * TILE_SIZE, '#ffb852', 3)  
+    ];
+
+    pellets = [];
+    powerPellets = [];
+    
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            if (mapLayout[r][c] === 0) pellets.push({ col: c, row: r });
+            if (mapLayout[r][c] === 3) powerPellets.push({ col: c, row: r });
+        }
+    }
+}
+
+function makeGhostsVulnerable() {
+    ghosts.forEach(g => {
+        g.isVulnerable = true;
+        setTimeout(() => { g.isVulnerable = false; }, 8000);
+    });
+}
+
+function checkWin() {
+    if (pellets.length === 0 && powerPellets.length === 0) {
+        resetLevel();
+    }
+}
+
+function handleDeath() {
+    lives--;
+    livesEl.innerText = lives;
+    if (lives <= 0) {
+        gameActive = false;
+        hasSavedScore = false;
+        openGameOverPanel();
+    } else {
+        pacman.x = 10 * TILE_SIZE;
+        pacman.y = 15 * TILE_SIZE;
+        pacman.dir = STOP;
+        pacman.nextDir = STOP;
+        
+        ghosts.forEach((g, i) => {
+            g.x = (10 + (i%3 - 1)) * TILE_SIZE;
+            g.y = 13 * TILE_SIZE;
+        });
+    }
+}
+
+function drawMap() {
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = '#1919A6';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            if (mapLayout[r][c] === 1) {
+                ctx.strokeRect(c * TILE_SIZE + 4, r * TILE_SIZE + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+            }
+            if (mapLayout[r][c] === 4) {
+                ctx.fillStyle = 'pink';
+                ctx.fillRect(c * TILE_SIZE, r * TILE_SIZE + 8, TILE_SIZE, 4);
+            }
+        }
+    }
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffb8ae';
+    pellets.forEach(p => {
+        ctx.fillRect(p.col * TILE_SIZE + TILE_SIZE/2 - 2, p.row * TILE_SIZE + TILE_SIZE/2 - 2, 4, 4);
+    });
+
+    if (Math.floor(Date.now() / 200) % 2 === 0) {
+        ctx.fillStyle = '#ffb8ae';
+        powerPellets.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.col * TILE_SIZE + TILE_SIZE/2, p.row * TILE_SIZE + TILE_SIZE/2, 7, 0, Math.PI*2);
+            ctx.fill();
+        });
+    }
+}
+
+function animate() {
+    if (!gameActive) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frameCount++;
+
+    drawMap();
+
+    pacman.update();
+    pacman.draw();
+
+    ghosts.forEach(g => {
+        g.update();
+        g.draw();
+
+        const dist = Math.hypot(g.x - pacman.x, g.y - pacman.y);
+        if (dist < TILE_SIZE - 5) {
+            if (g.isVulnerable) {
+                g.x = 10 * TILE_SIZE;
+                g.y = 13 * TILE_SIZE;
+                g.isVulnerable = false;
+                score += 200;
+                scoreEl.innerText = score;
+            } else if (!g.isDead) {
+                handleDeath();
+            }
+        }
+    });
+
+    animationId = requestAnimationFrame(animate);
+}
+
+window.addEventListener('keydown', e => {
+    if (!gameActive) return;
+    
+    switch(e.key) {
+        case 'ArrowUp': pacman.nextDir = UP; break;
+        case 'ArrowDown': pacman.nextDir = DOWN; break;
+        case 'ArrowLeft': pacman.nextDir = LEFT; break;
+        case 'ArrowRight': pacman.nextDir = RIGHT; break;
+    }
+});
+
+startBtn.addEventListener('click', initGame);
+restartBtn.addEventListener('click', initGame);
+saveScoreButton.addEventListener('click', handleSaveScore);
+returnGamesButton.addEventListener('click', () => {
+    window.location.href = '/play';
+});
+playerNameInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') handleSaveScore();
+});
+
+drawMap();
+
+</script>
+</body>
+</html>

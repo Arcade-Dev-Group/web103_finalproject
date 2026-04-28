@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SPEEDBALL: CLASSIC TRIBUTE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body {
+            margin: 0;
+            background-color: #050505;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+            border: 4px solid #333;
+        }
+
+        canvas {
+            display: block;
+            background-color: #000;
+            image-rendering: pixelated;
+        }
+
+        /* CRT Scanline Effect */
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.2) 50%,
+                rgba(0,0,0,0.2)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+            text-shadow: 2px 2px #000;
+            z-index: 5;
+            font-size: 12px;
+        }
+
+        .hud-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #fff;
+            padding: 10px;
+            border-radius: 2px;
+            min-width: 120px;
+        }
+
+        .energy-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            margin-top: 8px;
+            border: 1px solid #555;
+        }
+        .energy-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.1s;
+        }
+
+        #message {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            color: #ffff00;
+            text-shadow: 4px 4px #ff0000;
+            display: none;
+            z-index: 20;
+            text-align: center;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border: 2px solid #fff;
+        }
+        
+        .controls-hint {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+            z-index: 5;
+        }
+        .game-over-panel {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 25;
+        }
+        .game-over-card {
+            width: min(92vw, 420px);
+            background: #191919;
+            border: 2px solid #00ffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        .game-over-card h2 {
+            margin: 0 0 8px;
+            color: #00ffff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 20px;
+        }
+        .game-over-card p {
+            margin: 10px 0;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .name-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #0f0f0f;
+            color: #fff;
+            font-size: 14px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .actions button {
+            flex: 1;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            box-shadow: none;
+            text-transform: none;
+        }
+        .save-btn {
+            background: #00ffff;
+            color: #111;
+        }
+        .restart-btn {
+            background: #2c8cff;
+            color: #fff;
+        }
+        .secondary-action {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            background: #3a3a3a;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            box-shadow: none;
+            text-transform: none;
+        }
+        .save-status {
+            min-height: 20px;
+            margin-top: 8px;
+            color: #8ddf8d;
+            font-size: 12px;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="scanlines"></div>
+    
+    <div id="ui-layer">
+        <div class="hud-panel" style="border-color: #00ffff; color: #00ffff;">
+            <div>PLAYER 1</div>
+            <div id="score-p1">00</div>
+            <div class="energy-bar"><div class="energy-fill" id="energy-p1" style="background:#00ffff;"></div></div>
+            <div style="font-size: 8px; margin-top:5px;">ENERGY</div>
+        </div>
+        
+        <div class="hud-panel" style="border-color: #ff0055; color: #ff0055;">
+            <div style="text-align: right;">CPU</div>
+            <div id="score-p2" style="text-align: right;">00</div>
+            <div class="energy-bar"><div class="energy-fill" id="energy-p2" style="background:#ff0055;"></div></div>
+            <div style="font-size: 8px; margin-top:5px; text-align: right;">ENERGY</div>
+        </div>
+    </div>
+
+    <div id="message">GOAL!</div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="controls-hint">ARROWS to Move &bull; SPACE to Dash/Kick</div>
+
+    <div id="game-over-screen" class="game-over-panel hidden" aria-hidden="true">
+        <div class="game-over-card" role="dialog" aria-labelledby="game-over-title">
+            <h2 id="game-over-title">Match Over</h2>
+            <p>Final Score: <strong id="final-score">0</strong></p>
+            <input id="player-name" class="name-input" type="text" maxlength="40" placeholder="Enter your name" />
+            <div class="actions">
+                <button id="save-score-btn" class="save-btn" type="button">Save Score</button>
+                <button id="restart-btn" class="restart-btn" type="button">Play Again</button>
+            </div>
+            <button id="return-games-btn" class="secondary-action" type="button">Return to Games</button>
+            <p id="save-status" class="save-status"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // UI Elements
+    const scoreP1El = document.getElementById('score-p1');
+    const scoreP2El = document.getElementById('score-p2');
+    const energyP1El = document.getElementById('energy-p1');
+    const energyP2El = document.getElementById('energy-p2');
+    const msgEl = document.getElementById('message');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const finalScoreElement = document.getElementById('final-score');
+    const playerNameInput = document.getElementById('player-name');
+    const saveScoreButton = document.getElementById('save-score-btn');
+    const restartButton = document.getElementById('restart-btn');
+    const returnGamesButton = document.getElementById('return-games-btn');
+    const saveStatus = document.getElementById('save-status');
+    const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://server-x77u.onrender.com';
+
+    // Game Constants
+    const FRICTION = 0.97;
+    const WALL_BOUNCE = 0.7;
+    const PLAYER_SPEED = 3.5;
+    const DASH_MULTIPLIER = 2.5;
+    const BALL_MAX_SPEED = 14;
+    const WIN_SCORE = 5;
+
+    // Input State
+    const keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false, Space: false };
+
+    // Game State
+    let scoreP1 = 0;
+    let scoreP2 = 0;
+    let particles = [];
+    let isGoalActive = false;
+    let matchActive = true;
+    let hasSavedScore = false;
+
+    async function saveScore(playerName, finalScore) {
+        try {
+            const response = await fetch(`${API_BASE}/api/scores`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    player_name: playerName,
+                    game_name: 'Ball Runner',
+                    score: finalScore
+                })
+            });
+            return response.ok;
+        } catch (_err) {
+            return false;
+        }
+    }
+
+    function openGameOverPanel() {
+        finalScoreElement.textContent = String(scoreP1);
+        const storedName = localStorage.getItem('arcade_player_name') || '';
+        playerNameInput.value = storedName;
+        saveStatus.textContent = '';
+        saveScoreButton.disabled = false;
+        gameOverScreen.classList.remove('hidden');
+        gameOverScreen.setAttribute('aria-hidden', 'false');
+        setTimeout(() => playerNameInput.focus(), 0);
+    }
+
+    async function handleSaveScore() {
+        if (hasSavedScore) {
+            saveStatus.textContent = 'Score already saved.';
+            return;
+        }
+
+        const playerName = (playerNameInput.value || 'Guest').trim() || 'Guest';
+        localStorage.setItem('arcade_player_name', playerName);
+
+        saveScoreButton.disabled = true;
+        saveStatus.textContent = 'Saving...';
+
+        const ok = await saveScore(playerName, scoreP1);
+        if (ok) {
+            hasSavedScore = true;
+            saveStatus.textContent = `Saved for ${playerName}!`;
+            return;
+        }
+
+        saveStatus.textContent = 'Could not save score. Try again.';
+        saveScoreButton.disabled = false;
+    }
+
+    function resetMatch() {
+        scoreP1 = 0;
+        scoreP2 = 0;
+        particles = [];
+        isGoalActive = false;
+        matchActive = true;
+        hasSavedScore = false;
+        scoreP1El.innerText = '00';
+        scoreP2El.innerText = '00';
+        ball.reset();
+        p1.resetPos();
+        p2.resetPos();
+        p1.energy = p1.maxEnergy;
+        p2.energy = p2.maxEnergy;
+        msgEl.style.display = 'none';
+        gameOverScreen.classList.add('hidden');
+        gameOverScreen.setAttribute('aria-hidden', 'true');
+    }
+
+    function endMatch(winner) {
+        matchActive = false;
+        hasSavedScore = false;
+        msgEl.innerText = winner === 1 ? 'YOU WIN!' : 'CPU WINS!';
+        msgEl.style.display = 'block';
+        openGameOverPanel();
+    }
+
+    // --- CLASSES ---
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 8;
+            this.vy = (Math.random() - 0.5) * 8;
+            this.life = 1.0;
+            this.color = color;
+            this.size = Math.random() * 4 + 2;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.04;
+            this.size *= 0.95;
+        }
+        draw() {
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.size, this.size);
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    class Ball {
+        constructor() {
+            this.radius = 7;
+            this.reset();
+        }
+
+        reset() {
+            this.x = canvas.width / 2;
+            this.y = canvas.height / 2;
+            this.vx = 0;
+            this.vy = 0;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Friction
+            this.vx *= FRICTION;
+            this.vy *= FRICTION;
+
+            // Cap speed
+            const speed = Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+            if(speed > BALL_MAX_SPEED) {
+                this.vx = (this.vx / speed) * BALL_MAX_SPEED;
+                this.vy = (this.vy / speed) * BALL_MAX_SPEED;
+            }
+
+            // Wall Collisions
+            if (this.x - this.radius < 0) {
+                this.x = this.radius;
+                this.vx = -this.vx * WALL_BOUNCE;
+                createExplosion(this.x, this.y, '#fff');
+            }
+            if (this.x + this.radius > canvas.width) {
+                this.x = canvas.width - this.radius;
+                this.vx = -this.vx * WALL_BOUNCE;
+                createExplosion(this.x, this.y, '#fff');
+            }
+            if (this.y - this.radius < 0) {
+                this.y = this.radius;
+                this.vy = -this.vy * WALL_BOUNCE;
+                createExplosion(this.x, this.y, '#fff');
+            }
+            if (this.y + this.radius > canvas.height) {
+                this.y = canvas.height - this.radius;
+                this.vy = -this.vy * WALL_BOUNCE;
+                createExplosion(this.x, this.y, '#fff');
+            }
+
+            // Goal Detection (Goal is 100px high, centered vertically)
+            const goalTop = (canvas.height / 2) - 50;
+            const goalBottom = (canvas.height / 2) + 50;
+
+            if (this.x < 40 && this.y > goalTop && this.y < goalBottom) {
+                goalScored(2);
+            }
+            if (this.x > canvas.width - 40 && this.y > goalTop && this.y < goalBottom) {
+                goalScored(1);
+            }
+        }
+
+        draw() {
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#fff";
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // Ball detail
+            ctx.fillStyle = "#000";
+            ctx.beginPath();
+            ctx.arc(this.x - 2, this.y - 2, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    class Player {
+        constructor(isCPU) {
+            this.w = 20;
+            this.h = 32;
+            this.isCPU = isCPU; // Fixed scope issue here
+            this.resetPos();
+            this.energy = 100;
+            this.maxEnergy = 100;
+            this.color = isCPU ? '#ff0055' : '#00ffff';
+            this.dashTimer = 0;
+        }
+
+        resetPos() {
+            this.x = this.isCPU ? canvas.width - 100 : 100;
+            this.y = canvas.height / 2;
+            this.vx = 0;
+            this.vy = 0;
+            this.dashing = false;
+        }
+
+        update(ball) {
+            let currentSpeed = PLAYER_SPEED;
+            
+            // Dash Logic
+            if (this.dashTimer > 0) {
+                this.dashTimer--;
+                this.dashing = true;
+                currentSpeed *= DASH_MULTIPLIER;
+            } else {
+                this.dashing = false;
+                if(this.energy < this.maxEnergy) this.energy += 0.8; // Recharge
+            }
+
+            if (!this.isCPU) {
+                // Human Control
+                if (keys.ArrowUp) this.y -= currentSpeed;
+                if (keys.ArrowDown) this.y += currentSpeed;
+                if (keys.ArrowLeft) this.x -= currentSpeed;
+                if (keys.ArrowRight) this.x += currentSpeed;
+
+                if (keys.Space && this.energy > 10 && this.dashTimer === 0) {
+                    this.dashTimer = 15; // Dash duration
+                    this.energy -= 20; // Cost
+                }
+            } else {
+                // AI Logic
+                const dx = ball.x - this.x;
+                const dy = ball.y - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // Move towards ball
+                if(dist > 5) {
+                    this.x += (dx / dist) * (currentSpeed * 0.9);
+                    this.y += (dy / dist) * (currentSpeed * 0.9);
+                }
+                
+                // Defensive positioning
+                if(ball.x < canvas.width/2 && this.x > canvas.width/2) {
+                     this.x -= currentSpeed; // Retreat to goal
+                }
+            }
+
+            // Boundary Check
+            if(this.x < 0) this.x = 0;
+            if(this.x > canvas.width - this.w) this.x = canvas.width - this.w;
+            if(this.y < 0) this.y = 0;
+            if(this.y > canvas.height - this.h) this.y = canvas.height - this.h;
+
+            // Ball Collision
+            this.checkBallCollision(ball);
+        }
+
+        checkBallCollision(ball) {
+            // Simple AABB vs Circle collision approximation
+            let testX = ball.x;
+            let testY = ball.y;
+
+            if (ball.x < this.x) testX = this.x;
+            else if (ball.x > this.x + this.w) testX = this.x + this.w;
+            
+            if (ball.y < this.y) testY = this.y;
+            else if (ball.y > this.y + this.h) testY = this.y + this.h;
+
+            let distX = ball.x - testX;
+            let distY = ball.y - testY;
+            let distance = Math.sqrt((distX*distX) + (distY*distY));
+
+            if (distance <= ball.radius) {
+                // Impact!
+                let force = this.dashing ? 18 : 7;
+                
+                // Calculate angle
+                let angle = Math.atan2(distY, distX);
+                
+                ball.vx = Math.cos(angle) * force;
+                ball.vy = Math.sin(angle) * force;
+                
+                // Push ball out slightly to prevent sticking
+                ball.x += Math.cos(angle) * 5;
+                ball.y += Math.sin(angle) * 5;
+
+                createExplosion(ball.x, ball.y, this.color);
+                
+                if(this.dashing) {
+                    this.dashTimer = 0; // End dash on impact
+                    this.energy = 0;
+                }
+            }
+        }
+
+        draw() {
+            ctx.save();
+            
+            // Body
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            
+            // Visor
+            ctx.fillStyle = "#000";
+            if(!this.isCPU) {
+                ctx.fillRect(this.x + 2, this.y + 6, 16, 6);
+            } else {
+                ctx.fillRect(this.x + 2, this.y + 6, 16, 6);
+            }
+            
+            // Armor Detail
+            ctx.fillStyle = "rgba(255,255,255,0.3)";
+            ctx.fillRect(this.x + 4, this.y + 14, 12, 10);
+
+            // Dash Trail
+            if(this.dashing) {
+                ctx.globalAlpha = 0.4;
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(this.x - 10, this.y, this.w, this.h);
+                ctx.globalAlpha = 1.0;
+            }
+            
+            ctx.restore();
+        }
+    }
+
+    // --- SETUP ---
+    const ball = new Ball();
+    const p1 = new Player(false);
+    const p2 = new Player(true);
+
+    function createExplosion(x, y, color) {
+        for(let i=0; i<15; i++) {
+            particles.push(new Particle(x, y, color));
+        }
+    }
+
+    function goalScored(playerNum) {
+        if(isGoalActive) return; // Prevent double scoring
+        isGoalActive = true;
+
+        if(playerNum === 1) scoreP1++;
+        else scoreP2++;
+        
+        scoreP1El.innerText = scoreP1.toString().padStart(2, '0');
+        scoreP2El.innerText = scoreP2.toString().padStart(2, '0');
+        
+        msgEl.style.display = 'block';
+        msgEl.innerText = playerNum === 1 ? "PLAYER 1 SCORES!" : "CPU SCORES!";
+
+        if (scoreP1 >= WIN_SCORE || scoreP2 >= WIN_SCORE) {
+            setTimeout(() => {
+                endMatch(scoreP1 >= WIN_SCORE ? 1 : 2);
+            }, 900);
+            return;
+        }
+        
+        setTimeout(() => {
+            msgEl.style.display = 'none';
+            ball.reset();
+            p1.resetPos();
+            p2.resetPos();
+            isGoalActive = false;
+        }, 2000);
+    }
+
+    function drawCourt() {
+        // Background Grid
+        ctx.strokeStyle = "#1a1a1a";
+        ctx.lineWidth = 2;
+        
+        // Vertical Lines
+        for(let i=0; i<canvas.width; i+=50) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        }
+        // Horizontal Lines
+        for(let i=0; i<canvas.height; i+=50) {
+            ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+        }
+
+        // Center Line
+        ctx.strokeStyle = "#444";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width/2, 0);
+        ctx.lineTo(canvas.width/2, canvas.height);
+        ctx.stroke();
+
+        // Center Circle
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, 80, 0, Math.PI*2);
+        ctx.stroke();
+
+        // Goals
+        ctx.fillStyle = "#222";
+        const goalY = (canvas.height/2) - 50;
+        ctx.fillRect(0, goalY, 40, 100); 
+        ctx.fillRect(canvas.width-40, goalY, 40, 100); 
+        
+        // Goal Nets
+        ctx.strokeStyle = "#555";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for(let i=0; i<40; i+=5) {
+            ctx.moveTo(i, goalY); ctx.lineTo(i, goalY+100);
+        }
+        ctx.stroke();
+    }
+
+    // --- MAIN LOOP ---
+    function loop() {
+        // Clear
+        ctx.fillStyle = "#050505";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        drawCourt();
+
+        // Update
+        if (matchActive) {
+            p1.update(ball);
+            p2.update(ball);
+            ball.update();
+        }
+
+        particles.forEach((p, index) => {
+            p.update();
+            if(p.life <= 0) particles.splice(index, 1);
+        });
+
+        // Draw
+        p1.draw();
+        p2.draw();
+        ball.draw();
+        particles.forEach(p => p.draw());
+
+        // Update UI Bars
+        energyP1El.style.width = p1.energy + "%";
+        energyP2El.style.width = p2.energy + "%";
+
+        requestAnimationFrame(loop);
+    }
+
+    // Event Listeners
+    window.addEventListener('keydown', e => {
+        if(keys.hasOwnProperty(e.code)) keys[e.code] = true;
+        if(e.code === 'Space') keys.Space = true;
+    });
+    window.addEventListener('keyup', e => {
+        if(keys.hasOwnProperty(e.code)) keys[e.code] = false;
+        if(e.code === 'Space') keys.Space = false;
+    });
+
+    saveScoreButton.addEventListener('click', handleSaveScore);
+    restartButton.addEventListener('click', resetMatch);
+    returnGamesButton.addEventListener('click', () => {
+        window.location.href = '/play';
+    });
+    playerNameInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') handleSaveScore();
+    });
+
+    window.addEventListener('keydown', e => {
+        if (e.code === 'Enter' && gameOverScreen.classList.contains('hidden')) {
+            resetMatch();
+        }
+    });
+
+    // Start
+    resetMatch();
+    loop();
+
+</script>
+</body>
+</html>

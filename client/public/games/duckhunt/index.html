@@ -1,0 +1,779 @@
+<html>
+
+<head>
+  <style>
+    #game-root {
+      position: relative;
+      width: 100%;
+      height: 520px;
+      overflow: hidden;
+      border-radius: var(--border-radius-lg);
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    #gc {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #hud {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      pointer-events: none;
+    }
+
+    .hud-box {
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 8px;
+      padding: 6px 12px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      min-width: 80px;
+    }
+
+    .hud-label {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-bottom: 2px;
+    }
+
+    .hud-val {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    #bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 160px;
+    }
+
+    .bar-wrap {
+      background: rgba(0, 0, 0, 0.45);
+      border-radius: 8px;
+      padding: 5px 10px;
+    }
+
+    .bar-label {
+      font-size: 10px;
+      color: #fff;
+      opacity: 0.7;
+      margin-bottom: 3px;
+    }
+
+    .bar-track {
+      height: 10px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.1s;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.65);
+      color: #fff;
+      border-radius: var(--border-radius-lg);
+    }
+
+    #overlay h2 {
+      font-size: 28px;
+      margin: 0 0 8px;
+    }
+
+    #overlay p {
+      margin: 4px 0;
+      font-size: 15px;
+      opacity: 0.85;
+    }
+
+    .overlay-card {
+      width: min(92vw, 420px);
+      background: rgba(25, 25, 25, 0.96);
+      border: 2px solid #ffd700;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+
+    .name-input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #0f0f0f;
+      color: #fff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .actions button,
+    .secondary-action {
+      border: 0;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .actions button {
+      flex: 1;
+      padding: 10px 12px;
+    }
+
+    .save-btn {
+      background: #ffd700;
+      color: #111;
+    }
+
+    .restart-btn {
+      background: #2c8cff;
+      color: #fff;
+    }
+
+    .secondary-action {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: #3a3a3a;
+      color: #fff;
+    }
+
+    .save-status {
+      min-height: 20px;
+      margin-top: 8px;
+      color: #8ddf8d;
+      font-size: 14px;
+    }
+
+    #flash {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      border-radius: var(--border-radius-lg);
+      opacity: 0;
+    }
+
+    #ammo-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .ammo-pip {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #FFD700;
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      transition: background 0.1s;
+    }
+
+    .ammo-pip.empty {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+
+</head>
+
+<body>
+  <div id="game-root">
+    <canvas id="gc" width="1413" height="520"></canvas>
+    <div id="hud">
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div class="hud-box">
+          <div class="hud-label">LEVEL</div>
+          <div class="hud-val" id="h-lvl">2</div>
+        </div>
+        <div class="hud-box">
+          <div class="hud-label">SCORE</div>
+          <div class="hud-val" id="h-score">605</div>
+        </div>
+        <div class="hud-box">
+          <div class="hud-label">DUCKS</div>
+          <div class="hud-val" id="h-ducks">5</div>
+        </div>
+      </div>
+      <div id="bar-row">
+        <div class="bar-wrap">
+          <div class="bar-label">PLAYER HP</div>
+          <div class="bar-track">
+            <div class="bar-fill" id="php-bar" style="width: 100%; background: rgb(46, 204, 64);"></div>
+          </div>
+        </div>
+        <div class="bar-wrap" id="boss-hp-wrap" style="display: none;">
+          <div class="bar-label">BOSS HP</div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bhp-bar" style="width: 0%; background: rgb(231, 76, 60);"></div>
+          </div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label">AMMO</div>
+          <div id="ammo-row">
+            <div class="ammo-pip"></div>
+            <div class="ammo-pip"></div>
+            <div class="ammo-pip"></div>
+            <div class="ammo-pip"></div>
+            <div class="ammo-pip"></div>
+            <div class="ammo-pip empty"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="flash" style="background: rgba(220, 30, 30, 0.25); opacity: 0;"></div>
+    <div id="overlay" style="display:none">
+      <div class="overlay-card" role="dialog" aria-labelledby="ol-title">
+        <h2 id="ol-title">Game Over</h2>
+        <p id="ol-sub"></p>
+        <p id="ol-score"></p>
+        <input id="player-name" class="name-input" type="text" maxlength="40" placeholder="Enter your name" />
+        <div class="actions">
+          <button id="save-score-btn" class="save-btn" type="button">Save Score</button>
+          <button id="ol-btn" class="restart-btn" type="button">Play Again</button>
+        </div>
+        <button id="return-games-btn" class="secondary-action" type="button">Return to Games</button>
+        <p id="save-status" class="save-status"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.getElementById('game-root');
+      const canvas = document.getElementById('gc');
+      const ctx = canvas.getContext('2d');
+      const overlay = document.getElementById('overlay');
+      const olTitle = document.getElementById('ol-title');
+      const olSub = document.getElementById('ol-sub');
+      const olScore = document.getElementById('ol-score');
+      const playerNameInput = document.getElementById('player-name');
+      const saveScoreButton = document.getElementById('save-score-btn');
+      const restartButton = document.getElementById('ol-btn');
+      const returnGamesButton = document.getElementById('return-games-btn');
+      const saveStatus = document.getElementById('save-status');
+
+      const MAX_AMMO = 6;
+      const RELOAD_MS = 1800;
+      const API_BASE = window.location.hostname === 'localhost'
+        ? 'http://localhost:3000'
+        : 'https://server-x77u.onrender.com';
+
+      let W, H;
+      function resize() {
+        const r = root.getBoundingClientRect();
+        W = canvas.width = r.width;
+        H = canvas.height = r.height;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      let score, level, ducksKilled, ducksNeeded, isBoss, gameOn;
+      let playerHp, playerMaxHp, ammo, reloading;
+      let duck, particles, shootCooldown, levelAnnounce;
+      let hasSavedScore = false;
+
+      async function saveScore(playerName, finalScore) {
+        try {
+          const response = await fetch(`${API_BASE}/api/scores`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              player_name: playerName,
+              game_name: 'Duck Hunt',
+              score: finalScore
+            })
+          });
+          return response.ok;
+        } catch (_err) {
+          return false;
+        }
+      }
+
+      function initGame() {
+        score = 0; level = 1; ducksKilled = 0; ducksNeeded = 5;
+        isBoss = false; gameOn = true;
+        playerHp = 100; playerMaxHp = 100;
+        ammo = MAX_AMMO; reloading = false;
+        particles = []; shootCooldown = 0; levelAnnounce = 0;
+        hasSavedScore = false;
+        duck = new Duck(false);
+        updateHUD();
+        buildAmmo();
+        overlay.style.display = 'none';
+        document.getElementById('boss-hp-wrap').style.display = 'none';
+        saveScoreButton.disabled = false;
+      }
+
+      function buildAmmo() {
+        const row = document.getElementById('ammo-row');
+        row.innerHTML = '';
+        for (let i = 0; i < MAX_AMMO; i++) {
+          const d = document.createElement('div');
+          d.className = 'ammo-pip' + (i >= ammo ? ' empty' : '');
+          row.appendChild(d);
+        }
+      }
+
+      function updateHUD() {
+        document.getElementById('h-lvl').textContent = level;
+        document.getElementById('h-score').textContent = score;
+        document.getElementById('h-ducks').textContent = isBoss ? 'BOSS!' : (ducksNeeded - ducksKilled);
+        const pp = document.getElementById('php-bar');
+        const pct = Math.max(0, (playerHp / playerMaxHp) * 100);
+        pp.style.width = pct + '%';
+        pp.style.background = pct > 60 ? '#2ecc40' : pct > 30 ? '#f39c12' : '#e74c3c';
+        buildAmmo();
+      }
+
+      function updateBossBar() {
+        const wrap = document.getElementById('boss-hp-wrap');
+        if (isBoss && duck) {
+          wrap.style.display = '';
+          const b = document.getElementById('bhp-bar');
+          b.style.width = Math.max(0, (duck.hp / duck.maxHp) * 100) + '%';
+        } else {
+          wrap.style.display = 'none';
+        }
+      }
+
+      class Duck {
+        constructor(boss) {
+          this.boss = boss;
+          this.w = boss ? 90 : 38; this.h = boss ? 70 : 28;
+          this.x = Math.random() * (W - this.w - 80) + 40;
+          this.y = Math.random() * (H * 0.6 - this.h) + 40;
+          const sp = 1 + (level * 0.18);
+          this.vx = (Math.random() < 0.5 ? 1 : -1) * (3 + Math.random() * 3) * sp;
+          this.vy = (Math.random() < 0.5 ? 1 : -1) * (1.5 + Math.random() * 2) * sp;
+          this.maxHp = boss ? (8 + level * 4) : 1;
+          this.hp = this.maxHp;
+          this.flap = 0; this.flapDir = 1;
+          this.shootTimer = boss ? (120 - level * 8) : 0;
+          this.wobble = 0;
+          this.hitFlash = 0;
+        }
+        update() {
+          this.x += this.vx; this.y += this.vy;
+          if (this.x <= 0) { this.x = 0; this.vx = Math.abs(this.vx); }
+          if (this.x >= W - this.w) { this.x = W - this.w; this.vx = -Math.abs(this.vx); }
+          if (this.y <= 30) { this.y = 30; this.vy = Math.abs(this.vy); }
+          if (this.y >= H - this.h - 50) { this.y = H - this.h - 50; this.vy = -Math.abs(this.vy); }
+          this.flap += this.flapDir * 0.15;
+          if (this.flap > 1 || this.flap < -1) this.flapDir *= -1;
+          this.wobble += 0.08;
+          if (this.hitFlash > 0) this.hitFlash--;
+          if (this.boss) {
+            this.shootTimer--;
+            if (this.shootTimer <= 0) {
+              bossShoot(this);
+              const interval = Math.max(40, 80 - level * 5);
+              this.shootTimer = interval + Math.random() * 30;
+            }
+          }
+        }
+        draw() {
+          ctx.save();
+          const cx = this.x + this.w / 2, cy = this.y + this.h / 2;
+          if (this.hitFlash > 0) { ctx.globalAlpha = 0.5 + 0.5 * (this.hitFlash % 4 < 2); }
+          const bodyColor = this.boss ? '#c0392b' : '#27ae60';
+          const darkColor = this.boss ? '#922b21' : '#1a7a44';
+          const wingColor = this.boss ? '#e74c3c' : '#2ecc71';
+          // Wing
+          ctx.save();
+          ctx.translate(cx, cy);
+          const wingY = this.flap * 8;
+          ctx.fillStyle = wingColor;
+          ctx.beginPath();
+          ctx.ellipse(-this.w * 0.1, wingY, this.w * 0.35, this.h * 0.22, Math.PI * 0.15, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+          // Body
+          ctx.fillStyle = bodyColor;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy, this.w / 2, this.h / 2, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Belly
+          ctx.fillStyle = this.boss ? '#e8807a' : '#7dde9a';
+          ctx.beginPath();
+          ctx.ellipse(cx + this.w * 0.08, cy + this.h * 0.1, this.w * 0.28, this.h * 0.3, 0, 0, Math.PI * 2);
+          ctx.fill();
+          // Head
+          ctx.fillStyle = darkColor;
+          const headX = this.vx > 0 ? cx + this.w * 0.22 : cx - this.w * 0.22;
+          ctx.beginPath();
+          ctx.arc(headX, cy - this.h * 0.3, this.boss ? 20 : 10, 0, Math.PI * 2);
+          ctx.fill();
+          // Eye
+          ctx.fillStyle = '#fff';
+          ctx.beginPath(); ctx.arc(headX + (this.vx > 0 ? 4 : -4), cy - this.h * 0.36, this.boss ? 5 : 3, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#111';
+          ctx.beginPath(); ctx.arc(headX + (this.vx > 0 ? 5 : -5), cy - this.h * 0.36, this.boss ? 3 : 2, 0, Math.PI * 2); ctx.fill();
+          // Beak
+          ctx.fillStyle = '#e67e22';
+          ctx.beginPath();
+          const bkDir = this.vx > 0 ? 1 : -1;
+          ctx.moveTo(headX + bkDir * 8, cy - this.h * 0.3);
+          ctx.lineTo(headX + bkDir * (this.boss ? 26 : 14), cy - this.h * 0.32);
+          ctx.lineTo(headX + bkDir * (this.boss ? 26 : 14), cy - this.h * 0.25);
+          ctx.closePath(); ctx.fill();
+          // Boss crown
+          if (this.boss) {
+            ctx.fillStyle = '#FFD700';
+            for (let i = 0; i < 5; i++) {
+              const angle = -Math.PI / 2 + (i - 2) * 0.28;
+              const r = 22;
+              const tx = headX + Math.cos(angle) * r, ty = (cy - this.h * 0.3) + Math.sin(angle) * r - 14;
+              ctx.beginPath();
+              ctx.moveTo(headX, cy - this.h * 0.3 - 22);
+              ctx.lineTo(tx, ty);
+              ctx.lineTo(headX + (Math.cos(angle + 0.14)) * 12, (cy - this.h * 0.3) + Math.sin(angle + 0.14) * 12 - 16);
+              ctx.closePath();
+              ctx.fill();
+            }
+          }
+          // HP bar above duck
+          if (this.boss) {
+            const bw = 80, bh = 8;
+            const bx = cx - bw / 2, by = this.y - 22;
+            ctx.fillStyle = 'rgba(0,0,0,0.4)';
+            ctx.fillRect(bx - 1, by - 1, bw + 2, bh + 2);
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(bx, by, bw, bh);
+            ctx.fillStyle = '#2ecc40';
+            ctx.fillRect(bx, by, bw * (this.hp / this.maxHp), bh);
+          }
+          ctx.restore();
+        }
+        hit() {
+          this.hp--;
+          this.hitFlash = 8;
+          spawnParticles(this.x + this.w / 2, this.y + this.h / 2, this.boss ? '#e74c3c' : '#2ecc71');
+          if (this.hp <= 0) return true;
+          return false;
+        }
+      }
+
+      let bossProjectiles = [];
+      function bossShoot(b) {
+        const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+        const px = W / 2, py = H - 100;
+        const dx = px - cx, dy = py - cy;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const sp = 3 + level * 0.4;
+        bossProjectiles.push({ x: cx, y: cy, vx: (dx / d) * sp, vy: (dy / d) * sp, r: 7 });
+        if (level >= 3) {
+          const a = Math.atan2(dy, dx);
+          bossProjectiles.push({ x: cx, y: cy, vx: Math.cos(a + 0.3) * sp, vy: Math.sin(a + 0.3) * sp, r: 7 });
+          bossProjectiles.push({ x: cx, y: cy, vx: Math.cos(a - 0.3) * sp, vy: Math.sin(a - 0.3) * sp, r: 7 });
+        }
+      }
+
+      function spawnParticles(x, y, color) {
+        for (let i = 0; i < 8; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const sp = 2 + Math.random() * 4;
+          particles.push({ x, y, vx: Math.cos(angle) * sp, vy: Math.sin(angle) * sp, life: 30, maxLife: 30, color });
+        }
+      }
+
+      let playerProjectiles = [];
+      function playerShoot(px, py) {
+        if (ammo <= 0 || reloading) return;
+        ammo--;
+        buildAmmo();
+        if (ammo <= 0) {
+          reloading = true;
+          setTimeout(() => { ammo = MAX_AMMO; reloading = false; buildAmmo(); }, RELOAD_MS);
+        }
+        playerProjectiles.push({ x: px, y: py, tx: duck.x + duck.w / 2, ty: duck.y + duck.h / 2, life: 8, maxLife: 8 });
+        const hit = duck.hit();
+        score += hit ? (isBoss ? 200 : 50) : 5;
+        document.getElementById('h-score').textContent = score;
+        updateBossBar();
+        if (hit) spawnNext();
+      }
+
+      function spawnNext() {
+        bossProjectiles = [];
+        if (!isBoss && ducksKilled >= ducksNeeded - 1) {
+          isBoss = true;
+          duck = new Duck(true);
+          levelAnnounce = 120;
+          document.getElementById('h-ducks').textContent = 'BOSS!';
+          document.getElementById('boss-hp-wrap').style.display = '';
+        } else if (isBoss) {
+          isBoss = false; level++;
+          ducksKilled = 0; ducksNeeded += 2;
+          playerMaxHp = Math.min(playerMaxHp + 10, 150);
+          playerHp = playerMaxHp;
+          duck = new Duck(false);
+          levelAnnounce = 90;
+          document.getElementById('boss-hp-wrap').style.display = 'none';
+        } else {
+          ducksKilled++;
+          duck = new Duck(false);
+        }
+        updateHUD();
+      }
+
+      function takeDamage(dmg) {
+        playerHp = Math.max(0, playerHp - dmg);
+        updateHUD();
+        flashScreen('rgba(220,30,30,0.25)');
+        if (playerHp <= 0) endGame(false);
+      }
+
+      function flashScreen(color) {
+        const f = document.getElementById('flash');
+        f.style.background = color;
+        f.style.opacity = '1';
+        setTimeout(() => { f.style.transition = 'opacity 0.3s'; f.style.opacity = '0'; setTimeout(() => f.style.transition = '', 350); }, 50);
+      }
+
+      function endGame(win) {
+        gameOn = false;
+        const storedName = localStorage.getItem('arcade_player_name') || '';
+        playerNameInput.value = storedName;
+        saveStatus.textContent = '';
+        saveScoreButton.disabled = false;
+        overlay.style.display = 'flex';
+        olTitle.textContent = win ? 'Victory!' : 'Game Over';
+        olSub.textContent = win ? 'You defeated all the bosses!' : 'The ducks won this round.';
+        olScore.textContent = 'Final score: ' + score + ' | Level reached: ' + level;
+        setTimeout(() => playerNameInput.focus(), 0);
+      }
+
+      async function handleSaveScore() {
+        if (hasSavedScore) {
+          saveStatus.textContent = 'Score already saved.';
+          return;
+        }
+
+        const playerName = (playerNameInput.value || 'Guest').trim() || 'Guest';
+        localStorage.setItem('arcade_player_name', playerName);
+
+        saveScoreButton.disabled = true;
+        saveStatus.textContent = 'Saving...';
+
+        const ok = await saveScore(playerName, score);
+        if (ok) {
+          hasSavedScore = true;
+          saveStatus.textContent = `Saved for ${playerName}!`;
+          return;
+        }
+
+        saveStatus.textContent = 'Could not save score. Try again.';
+        saveScoreButton.disabled = false;
+      }
+
+      restartButton.addEventListener('click', initGame);
+      saveScoreButton.addEventListener('click', handleSaveScore);
+      returnGamesButton.addEventListener('click', () => {
+        window.location.href = '/play';
+      });
+      playerNameInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') handleSaveScore();
+      });
+
+      root.addEventListener('mousedown', (e) => {
+        if (!gameOn) return;
+        const r = root.getBoundingClientRect();
+        const mx = e.clientX - r.left, my = e.clientY - r.top;
+        if (mx >= duck.x && mx <= duck.x + duck.w && my >= duck.y && my <= duck.y + duck.h) {
+          playerShoot(mx, my);
+        } else {
+          playerShoot(mx, my);
+        }
+      });
+
+      root.addEventListener('touchstart', (e) => {
+        if (!gameOn) return;
+        e.preventDefault();
+        const r = root.getBoundingClientRect();
+        const t = e.touches[0];
+        const mx = t.clientX - r.left, my = t.clientY - r.top;
+        playerShoot(mx, my);
+      }, { passive: false });
+
+      let clouds = [];
+      for (let i = 0; i < 4; i++) clouds.push({ x: Math.random() * 680, y: 30 + Math.random() * 80, w: 80 + Math.random() * 60, s: 0.2 + Math.random() * 0.3 });
+
+      function drawSky() {
+        const g = ctx.createLinearGradient(0, 0, 0, H - 50);
+        g.addColorStop(0, '#4FC3F7'); g.addColorStop(1, '#B3E5FC');
+        ctx.fillStyle = g; ctx.fillRect(0, 0, W, H - 50);
+        // clouds
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        for (const c of clouds) {
+          ctx.beginPath();
+          ctx.ellipse(c.x, c.y, c.w, 20, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(c.x - c.w * 0.3, c.y + 8, c.w * 0.55, 15, 0, 0, Math.PI * 2); ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(c.x + c.w * 0.3, c.y + 5, c.w * 0.45, 13, 0, 0, Math.PI * 2); ctx.fill();
+          c.x += c.s; if (c.x > W + c.w) c.x = -c.w;
+        }
+        // ground
+        const gg = ctx.createLinearGradient(0, H - 50, 0, H);
+        gg.addColorStop(0, '#388E3C'); gg.addColorStop(1, '#2E7D32');
+        ctx.fillStyle = gg; ctx.fillRect(0, H - 50, W, 50);
+        // grass tufts
+        ctx.fillStyle = '#43A047';
+        for (let i = 0; i < W; i += 30) {
+          ctx.beginPath();
+          ctx.moveTo(i, H - 50);
+          ctx.quadraticCurveTo(i + 8, H - 62, i + 15, H - 50);
+          ctx.fill();
+        }
+      }
+
+      function drawParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx; p.y += p.vy; p.vy += 0.2; p.life--;
+          if (p.life <= 0) { particles.splice(i, 1); continue; }
+          ctx.globalAlpha = p.life / p.maxLife;
+          ctx.fillStyle = p.color;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      function drawPlayerProjectiles() {
+        for (let i = playerProjectiles.length - 1; i >= 0; i--) {
+          const p = playerProjectiles[i];
+          p.life--;
+          if (p.life <= 0) { playerProjectiles.splice(i, 1); continue; }
+          const t = p.life / p.maxLife;
+          const x = p.x + (p.tx - p.x) * (1 - t);
+          const y = p.y + (p.ty - p.y) * (1 - t);
+          ctx.fillStyle = '#FFD700';
+          ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = 'rgba(255,200,0,0.5)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y); ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+      }
+
+      function drawBossProjectiles() {
+        const playerX = W / 2, playerY = H - 90;
+        for (let i = bossProjectiles.length - 1; i >= 0; i--) {
+          const p = bossProjectiles[i];
+          p.x += p.vx; p.y += p.vy;
+          const dx = p.x - playerX, dy = p.y - playerY;
+          if (Math.sqrt(dx * dx + dy * dy) < 20) {
+            const dmg = isBoss ? 8 : 0;
+            bossProjectiles.splice(i, 1);
+            takeDamage(dmg);
+            continue;
+          }
+          if (p.x < -20 || p.x > W + 20 || p.y < -20 || p.y > H + 20) { bossProjectiles.splice(i, 1); continue; }
+          ctx.fillStyle = '#e74c3c';
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(255,100,100,0.4)';
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 3, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+
+      function drawPlayer() {
+        const px = W / 2, py = H - 90;
+        ctx.fillStyle = '#1a237e';
+        ctx.beginPath();
+        ctx.ellipse(px, py + 10, 18, 22, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#e8c49a';
+        ctx.beginPath(); ctx.arc(px, py - 10, 12, 0, Math.PI * 2); ctx.fill();
+        // hat
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(px - 14, py - 22, 28, 7);
+        ctx.fillRect(px - 10, py - 38, 20, 18);
+        // gun
+        ctx.fillStyle = '#555';
+        ctx.fillRect(px + 12, py - 5, 30, 5);
+        // HP display
+        const hpW = 50;
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(px - hpW / 2, py + 28, hpW, 8);
+        ctx.fillStyle = playerHp > 60 ? '#2ecc40' : playerHp > 30 ? '#f39c12' : '#e74c3c';
+        ctx.fillRect(px - hpW / 2, py + 28, hpW * (playerHp / playerMaxHp), 8);
+      }
+
+      function drawLevelAnnounce() {
+        if (levelAnnounce > 0) {
+          levelAnnounce--;
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, levelAnnounce / 20);
+          ctx.fillStyle = 'rgba(0,0,0,0.55)';
+          ctx.fillRect(W / 2 - 120, H / 2 - 40, 240, 80);
+          ctx.fillStyle = '#FFD700';
+          ctx.font = 'bold 28px sans-serif';
+          ctx.textAlign = 'center';
+          const msg = isBoss ? '👾 BOSS INCOMING!' : '✅ Level ' + level + '!';
+          ctx.fillText(msg, W / 2, H / 2 + 10);
+          ctx.restore();
+        }
+      }
+
+      function drawReloadIndicator() {
+        if (reloading) {
+          ctx.fillStyle = 'rgba(0,0,0,0.6)';
+          ctx.fillRect(W / 2 - 50, H - 45, 100, 24);
+          ctx.fillStyle = '#FFD700';
+          ctx.font = 'bold 13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('RELOADING...', W / 2, H - 28);
+        }
+      }
+
+      function loop() {
+        if (!gameOn) { requestAnimationFrame(loop); return; }
+        ctx.clearRect(0, 0, W, H);
+        drawSky();
+        if (duck) { duck.update(); duck.draw(); }
+        drawPlayer();
+        drawBossProjectiles();
+        drawPlayerProjectiles();
+        drawParticles();
+        drawLevelAnnounce();
+        drawReloadIndicator();
+        updateBossBar();
+        requestAnimationFrame(loop);
+      }
+
+      initGame();
+      loop();
+    })();
+  </script>
+</body>
+
+</html>

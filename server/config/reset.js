@@ -102,6 +102,13 @@ async function seedArcadeGames() {
     INSERT INTO arcade_games (name, genre, players, description, image_url, rating, play_url) VALUES
       ('Tetris',           'Puzzle',  1, 'Stack falling blocks and clear lines as fast as you can.',    'https://upload.wikimedia.org/wikipedia/commons/9/9c/Typical_Tetris_Game.svg',      9.5, '/games/tetris/index.html'),
       ('Pac-Man',          'Classic', 1, 'Navigate mazes and eat pellets while avoiding ghosts.',        'https://blog.sciencemuseum.org.uk/wp-content/uploads/sites/12/2017/10/Pacman.gif',  9.2, '/games/pacman/index.html'),
+      ('Pac-Man Plus',     'Classic', 1, 'Classic maze action with extra challenge and speed.',          'https://i.pinimg.com/originals/65/a7/d5/65a7d53c0c921de180b400a2a6892381.gif',                   8.9, '/games/pacmanplus/index.html'),
+      ('Shot Rider',       'Shooter', 1, 'Vertical scrolling action with boss battles every 5 levels.',  'https://online-emulators.com/user/arcade/logos/shtrider.webp',                8.6, '/games/shoterider/index.html'),
+      ('Ball Runner',      'Sports',  1, 'High-speed duel where precision dashes and goals decide the match.', 'https://tse3.mm.bing.net/th/id/OIP.KUNYiG0igpy6U8t3s9WXngHaDa?pid=Api&h=220&P=0',       8.5, '/games/ballRunner/index.html'),
+      ('Galaga',           'Shooter', 1, 'Pilot your ship, dodge enemy fire, and chase the high score.', 'https://gifdb.com/images/high/galaga-nes-game-cover-vf5ny1ziet4mv4zt.gif',                          9.0, '/games/galaga/index.html'),
+      ('Gyruss',           'Shooter', 1, 'Spiral into action with rotational gameplay and fast-paced combat.', 'https://www.c64-wiki.com/images/f/f0/Gyruss_Animation.gif',                         8.8, '/games/gyruus/index.html'),
+      ('Bomb Jack',        'Arcade',  1, 'Collect bombs, dodge devils, and rack up points across levels.', 'https://tse2.mm.bing.net/th/id/OIP.o0OGA2idvfct7OKVNkGW2gHaHa?pid=Api&h=220&P=0',         8.7, '/games/bomjack/index.html'),
+      ('Duck Hunt',        'Shooter', 1, 'Track the ducks, react quickly, and push for the highest score.', 'https://csdb.dk/gfx/releases/226000/226342.gif',        8.9, '/games/duckhunt/index.html'),
       ('Mortal Kombat II', 'Fighting',2, 'Brutal fighting game with fatalities and iconic characters.', 'https://upload.wikimedia.org/wikipedia/en/thumb/5/50/Mortal_Kombat_II_Poster_2026.jpg/250px-Mortal_Kombat_II_Poster_2026.jpg',9.0, '/games/mortal-kombat-ii/index.html'),
       ('Street Fighter',   'Fighting',2, 'Head-to-head fighting game with iconic characters.',           'https://cdn11.bigcommerce.com/s-yzgoj/images/stencil/500x659/products/3228749/6215112/XPE160541__37798.1709700114.jpg?c=2',      8.8, '/games/street-fighter/index.html');
   `)
