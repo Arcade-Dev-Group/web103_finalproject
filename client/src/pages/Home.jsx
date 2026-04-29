@@ -59,15 +59,8 @@ function Home() {
 
         <section className="section-about container">
           <h2>About Us</h2>
-          <p>
-            Arcade Bar is your go-to spot for games, drinks, and a good time with friends. Our goal is to create a fun and welcoming space where people can relax, compete, and enjoy a unique arcade experience.
-          </p>
-          <p>We offer a mix of classic arcade machines, pinball, and modern games so there is something for everyone. Whether you are visiting for the nostalgia of retro games or looking to try something new, Arcade Bar provides a variety of options to keep you entertained.</p><br/>
-          <p>In addition to games, we serve drinks and snacks that make it easy to stay and enjoy your time. The atmosphere is designed to be energetic and social, making it a great place for groups, casual nights out, or special events.</p><br/>
-          <p>At Arcade Bar, we focus on bringing people together through games, friendly competition, and shared experiences. Our goal is to create a place where every visit feels fun, engaging, and memorable.</p><br/>
+          <p>Arcade Bar is a fun, welcoming spot where you can enjoy classic and modern games, drinks, and snacks with friends. Whether you're there for retro nostalgia or something new, it offers a lively, social atmosphere perfect for casual hangouts, group outings, or special events, all centered around friendly competition and shared experiences.</p>
         </section>
-
-
 
         <section className="section-grid container">
           <div className="grid-2 content-grid">
