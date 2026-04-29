@@ -380,10 +380,10 @@ select:focus-visible {
 
 .events-carousel {
   position: relative;
-  max-width: 50rem;
-  margin: 2rem auto 0;
+  max-width: 60rem;
+  margin: 2.5rem auto 0;
   overflow: hidden;
-  border-radius: 1.2rem;
+  border-radius: 1.5rem;
   border: 2px solid var(--cyan);
 }
 
@@ -394,26 +394,26 @@ select:focus-visible {
 
 .event-slide {
   min-width: 100%;
-  padding: 2.5rem;
+  padding: 3.5rem;
   text-align: center;
   background: var(--bg-3);
 }
 
 .event-slide h3 {
-  font-size: 2.4rem;
+  font-size: 2.8rem;
   color: var(--pink);
   margin-bottom: 1rem;
 }
 
 .event-slide p {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   color: var(--cyan);
   margin-bottom: 0.5rem;
 }
 
 .event-slide p:last-child {
   color: var(--muted);
-  font-size: 1.5rem;
+  font-size: 1.7rem;
 }
 
 .carousel-prev,
