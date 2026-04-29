@@ -84,7 +84,7 @@ function Home() {
           <div className="events-box">
             <p className="section-label">This Week</p>
             <h2>Upcoming Events & Specials</h2>
-            <p>Check out game nights, drink deals, and tournaments happening throughout the week.</p>
+            <p>Check out game nights, drink deals, and weekend tournaments.</p>
           </div>
         </section>
       </main>
