@@ -80,13 +80,43 @@ function Home() {
           </div>
         </section>
 
-        <section className="section-events">
-          <div className="events-box">
-            <p className="section-label">This Week</p>
-            <h2>Upcoming Events & Specials</h2>
-            <p>Check out game nights, drink deals, and weekend tournaments.</p>
+        <section class="section-events">
+        <div class="events-box">
+          <p class="section-label">Events</p>
+          <h2>Upcoming Tournaments</h2>
+          <div class="events-carousel">
+            <div class="carousel-track" id="carousel-track">
+              <div class="event-slide">
+                <h3>Pac-Man Marathon</h3>
+                <p>Sunday, May 10 · 6PM - 10PM</p>
+                <p>Compete for highest score!</p>
+              </div>
+              <div class="event-slide">
+                <h3>Fighting Game Tournament</h3>
+                <p>Sunday, May 17 · 3PM - 9PM</p>
+                <p>Street Fighter & MK II prizes</p>
+              </div>
+              <div class="event-slide">
+                <h3>Tetris Blitz Night</h3>
+                <p>Sunday, May 24 · 7PM - 11PM</p>
+                <p>Speed Tetris challenge</p>
+              </div>
+              <div class="event-slide">
+                <h3>High Score Challenge</h3>
+                <p>Sunday, June 7 · 2PM - 8PM</p>
+                <p>Beat house high scores</p>
+              </div>
+              <div class="event-slide">
+                <h3>Arcade Championship</h3>
+                <p>Sunday, June 21 · 4PM - 10PM</p>
+                <p>Grand finals all games</p>
+              </div>
+            </div>
+            <button class="carousel-prev" id="prev-btn">&larr;</button>
+            <button class="carousel-next" id="next-btn">&rarr;</button>
           </div>
-        </section>
+        </div>
+      </section>
       </main>
 
       <Footer />
