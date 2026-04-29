@@ -51,6 +51,8 @@ Database: PostgreSQL
 ✅Users can see food and arcade game deals during happy hour.
 
 [gif goes here]
+[<img width="1897" height="955" alt="image" src="https://github.com/user-attachments/assets/109d7ec0-5341-4eab-b956-b754c444a51e" />](https://i.imgur.com/euBhjAU.gif)
+
 
 ### Tournament Registration
 
@@ -58,11 +60,15 @@ Database: PostgreSQL
 
 [gif goes here]
 
+https://i.imgur.com/98uVyoE.gif
+
 ### Game Ratings
 
 Users can rate arcade games from one to five stars.
 
 [gif goes here]
+
+https://i.imgur.com/pLgeTNG.gif
 
 ### [ADDITIONAL FEATURES GO HERE - ADD ALL FEATURES HERE IN THE FORMAT ABOVE; you will check these off and add gifs as you complete them]
 
