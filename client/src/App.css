@@ -1133,12 +1133,14 @@ select:focus-visible {
 
 /* Hero Section - Made Larger */
 .leaderboard-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  background: linear-gradient(rgba(15, 15, 26, 0.75), rgba(15, 15, 26, 0.75)),url("../public/img/Score.avif") no-repeat center center;
+  background-size: cover;
   padding: 6rem 1rem; /* Increased vertical padding */
   text-align: center;
   position: relative;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
+
 }
 
 .hero-content {
