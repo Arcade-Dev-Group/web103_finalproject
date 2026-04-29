@@ -1,7 +1,33 @@
+import { useEffect, useState, useRef } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 function Home() {
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const carouselRef = useRef(null);
+  const totalSlides = 5;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % totalSlides);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [totalSlides]);
+
+  const goPrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+  };
+
+  const goNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % totalSlides);
+  };
+
+  const trackStyle = {
+    transform: `translateX(-${currentIndex * 100}%)`,
+    transition: "transform 0.4s ease"
+  };
+
   return (
     <>
       <Header />
@@ -22,7 +48,7 @@ function Home() {
             className="feature-img"
             role="img"
             aria-label="Arcade games and neon lighting"
-          ></div>
+          />
           <div className="feature-text">
             <h2>Play Classic Games</h2>
             <p>
@@ -50,13 +76,13 @@ function Home() {
               className="img-box"
               role="img"
               aria-label="Food and drinks at the arcade bar"
-            ></div>
+            />
 
             <div
               className="img-box-2"
               role="img"
               aria-label="Players competing in arcade games"
-            ></div>
+            />
             <div className="text-box">
               <p>Challenge your friends, compete for high scores, and see who comes out on top.</p>
             </div>
@@ -68,7 +94,7 @@ function Home() {
               className="img-box-3"
               role="img"
               aria-label="Arcade event with bright lights"
-            ></div>
+            />
           </div>
         </section>
 
@@ -76,47 +102,59 @@ function Home() {
           <div className="signup-box">
             <p className="section-label">Stay Updated</p>
             <h2>Join the VIP List</h2>
-            <p>Get updates on events, special deals, and new games so you never miss out on what’s happening.</p>
+            <p>Get updates on events, special deals, and new games so you never miss out on what's happening.</p>
           </div>
         </section>
 
-        <section class="section-events">
-        <div class="events-box">
-          <p class="section-label">Events</p>
-          <h2>Upcoming Tournaments</h2>
-          <div class="events-carousel">
-            <div class="carousel-track" id="carousel-track">
-              <div class="event-slide">
-                <h3>Pac-Man Marathon</h3>
-                <p>Sunday, May 10 · 6PM - 10PM</p>
-                <p>Compete for highest score!</p>
+        <section className="section-events">
+          <div className="events-box">
+            <p className="section-label">Events</p>
+            <h2>Upcoming Tournaments</h2>
+            <div className="events-carousel">
+              <div className="carousel-track" style={trackStyle}>
+                <div className="event-slide">
+                  <h3>Pac-Man Marathon</h3>
+                  <p>Sunday, May 10 · 6PM–10PM</p>
+                  <p>Compete for highest score!</p>
+                </div>
+                <div className="event-slide">
+                  <h3>Fighting Game Tournament</h3>
+                  <p>Sunday, May 17 · 3PM–9PM</p>
+                  <p>Street Fighter & MK II prizes</p>
+                </div>
+                <div className="event-slide">
+                  <h3>Tetris Blitz Night</h3>
+                  <p>Sunday, May 24 · 7PM–11PM</p>
+                  <p>Speed Tetris challenge</p>
+                </div>
+                <div className="event-slide">
+                  <h3>High Score Challenge</h3>
+                  <p>Sunday, June 7 · 2PM–8PM</p>
+                  <p>Beat house high scores</p>
+                </div>
+                <div className="event-slide">
+                  <h3>Arcade Championship</h3>
+                  <p>Sunday, June 21 · 4PM–10PM</p>
+                  <p>Grand finals all games</p>
+                </div>
               </div>
-              <div class="event-slide">
-                <h3>Fighting Game Tournament</h3>
-                <p>Sunday, May 17 · 3PM - 9PM</p>
-                <p>Street Fighter & MK II prizes</p>
-              </div>
-              <div class="event-slide">
-                <h3>Tetris Blitz Night</h3>
-                <p>Sunday, May 24 · 7PM - 11PM</p>
-                <p>Speed Tetris challenge</p>
-              </div>
-              <div class="event-slide">
-                <h3>High Score Challenge</h3>
-                <p>Sunday, June 7 · 2PM - 8PM</p>
-                <p>Beat house high scores</p>
-              </div>
-              <div class="event-slide">
-                <h3>Arcade Championship</h3>
-                <p>Sunday, June 21 · 4PM - 10PM</p>
-                <p>Grand finals all games</p>
-              </div>
+              <button 
+                className="carousel-prev" 
+                onClick={goPrev}
+                aria-label="Previous event"
+              >
+                ‹
+              </button>
+              <button 
+                className="carousel-next" 
+                onClick={goNext}
+                aria-label="Next event"
+              >
+                ›
+              </button>
             </div>
-            <button class="carousel-prev" id="prev-btn">&larr;</button>
-            <button class="carousel-next" id="next-btn">&rarr;</button>
           </div>
-        </div>
-      </section>
+        </section>
       </main>
 
       <Footer />
