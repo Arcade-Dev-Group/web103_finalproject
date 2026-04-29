@@ -438,6 +438,38 @@ select:focus-visible {
   box-shadow: 0 0 18px rgba(0, 247, 255, 0.1);
 }
 
+.hours-list {
+  margin-top: 1.5rem;
+}
+
+.hours-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 1.6rem;
+}
+
+.hours-item:last-child {
+  border-bottom: none;
+}
+
+.hours-item span:first-child {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.hours-item span:last-child {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.menu-card h3 {
+  font-size: 2.2rem;
+  color: var(--pink);
+  margin: 1.5rem 0 1rem 0;
+}
+
 .menu-image,
 .event-image {
   width: 100%;
