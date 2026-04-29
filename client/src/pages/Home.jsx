@@ -62,9 +62,9 @@ function Home() {
           <p>
             Arcade Bar is your go-to spot for games, drinks, and a good time with friends. Our goal is to create a fun and welcoming space where people can relax, compete, and enjoy a unique arcade experience.
           </p>
-          <p>We offer a mix of classic arcade machines, pinball, and modern games so there is something for everyone. Whether you are visiting for the nostalgia of retro games or looking to try something new, Arcade Bar provides a variety of options to keep you entertained.</p>
-          <p>In addition to games, we serve drinks and snacks that make it easy to stay and enjoy your time. The atmosphere is designed to be energetic and social, making it a great place for groups, casual nights out, or special events.</p>
-          <p>At Arcade Bar, we focus on bringing people together through games, friendly competition, and shared experiences. Our goal is to create a place where every visit feels fun, engaging, and memorable.</p>
+          <p>We offer a mix of classic arcade machines, pinball, and modern games so there is something for everyone. Whether you are visiting for the nostalgia of retro games or looking to try something new, Arcade Bar provides a variety of options to keep you entertained.</p><br>
+          <p>In addition to games, we serve drinks and snacks that make it easy to stay and enjoy your time. The atmosphere is designed to be energetic and social, making it a great place for groups, casual nights out, or special events.</p><br>
+          <p>At Arcade Bar, we focus on bringing people together through games, friendly competition, and shared experiences. Our goal is to create a place where every visit feels fun, engaging, and memorable.</p><br>
         </section>
 
         <section className="section-grid container">
