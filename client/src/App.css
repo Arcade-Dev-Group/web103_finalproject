@@ -1011,3 +1011,269 @@ select:focus-visible {
     height: 18rem;
   }
 }
+
+
+
+
+Leaderboard page styles */
+:root {
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59, 130, 246, 0.5);
+  --gold: #fbbf24;
+  --silver: #94a3b8;
+  --bronze: #b45309;
+  --border: #334155;
+}
+
+/* Hero Section - Made Larger */
+.leaderboard-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+  padding: 6rem 1rem; /* Increased vertical padding */
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px; /* Wider content area */
+  margin: 0 auto;
+}
+
+.hero-content h1 {
+  font-size: 4.5rem; /* Much bigger title */
+  margin: 1.5rem 0;
+  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.hero-content p {
+  font-size: 1.25rem; /* Larger subtitle */
+  color: var(--text-secondary);
+}
+
+.badge {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  padding: 0.75rem 1.5rem; /* Larger badge */
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+
+/* Layout Grid - Wider Cards */
+.games-grid {
+  display: grid;
+  /* grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); Increased min width */
+  gap: 3rem; /* More space between cards */
+  margin: 4rem 0;
+}
+
+/* Game Panel - Bigger & Spacious */
+.game-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px; /* Larger radius */
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); /* Deeper shadow */
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.game-panel:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2);
+}
+
+.panel-header {
+  padding: 2rem; /* More padding */
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.2);
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.8rem; /* Larger game title */
+  font-weight: 700;
+}
+
+.total-scores {
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-dark);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+/* Score List - Larger Rows */
+.score-list {
+  padding: 0;
+}
+
+.score-row {
+  display: grid;
+  grid-template-columns: 0.8fr 2.5fr 1.2fr 1fr; /* Adjusted column widths */
+  padding: 1.5rem 2rem; /* Much taller rows */
+  border-bottom: 1px solid var(--border);
+  font-size: 1.2rem; /* Larger text */
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.score-row:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.score-row:last-child {
+  border-bottom: none;
+}
+
+.header-row {
+  background: rgba(0,0,0,0.4);
+  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 1.2rem 2rem;
+}
+
+.col-score {
+  font-weight: 800;
+  color: var(--accent);
+  text-align: right;
+  justify-content: flex-end;
+  display: flex;
+  font-size: 1.3rem; /* Score is biggest */
+  margin: auto;
+}
+
+/* Rank Highlights */
+.rank-gold { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); }
+.rank-gold .col-rank { color: var(--gold); font-size: 1.8rem; }
+
+.rank-silver { background: linear-gradient(90deg, rgba(148, 163, 184, 0.15) 0%, transparent 100%); }
+.rank-silver .col-rank { color: var(--silver); font-size: 1.8rem; }
+
+.rank-bronze { background: linear-gradient(90deg, rgba(180, 83, 9, 0.15) 0%, transparent 100%); }
+.rank-bronze .col-rank { color: var(--bronze); font-size: 1.8rem; }
+
+/* Buttons - Bigger */
+.cta-container {
+  text-align: center;
+  margin: 6rem 0;
+}
+
+.btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-lg {
+  padding: 1.25rem 3rem;
+  font-size: 1.3rem;
+}
+
+.btn-glow {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 0 20px var(--accent-glow);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-glow:hover {
+  box-shadow: 0 0 40px var(--accent-glow);
+  transform: scale(1.05);
+}
+
+/* Loading Skeleton - Larger */
+.skeleton-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 3rem;
+  margin: 4rem 0;
+}
+
+.skeleton-game-panel {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  height: 400px; /* Taller skeleton */
+}
+
+
+.skeleton-header, .skeleton-row {
+  background: #334155;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-header { height: 40px; width: 60%; }
+.skeleton-row { height: 30px; width: 100%; }
+
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* Error & Empty States */
+.error-box, .empty-state {
+  text-align: center;
+  padding: 6rem 2rem;
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  margin: 4rem 0;
+}
+
+.empty-icon { font-size: 6rem; margin-bottom: 2rem; display: block; }
+.empty-state h3 { font-size: 2rem; margin-bottom: 1rem; color: var(--text-primary); }
+.empty-state p { font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2rem; }
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .hero-content h1 { font-size: 3rem; }
+  .games-grid, .skeleton-container {
+    grid-template-columns: 1fr; /* Single column on mobile */
+    gap: 2rem;
+  }
+  .score-row {
+    grid-template-columns: 0.8fr 2fr 1.2fr;
+    padding: 1.2rem 1.5rem;
+    font-size: 1rem;
+  }
+  .col-date { display: none; }
+  .panel-header { flex-direction: column; gap: 1rem; text-align: center; }
+  .col-score { justify-content: center; }
+}

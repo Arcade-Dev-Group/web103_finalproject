@@ -44,6 +44,23 @@ const createScore = async (req, res) => {
   }
 }
 
+// GET /api/scores - all scores
+const getAllScores = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT gs.id, gs.player_name, g.name AS game_name, gs.score, gs.created_at
+       FROM game_scores gs
+       JOIN arcade_games g ON g.id = gs.game_id
+       ORDER BY gs.score DESC, gs.created_at ASC
+       LIMIT 100`,
+    )
+
+    return res.json(result.rows)
+  } catch (err) {
+    return res.status(500).json({ error: 'Error fetching leaderboard' })
+  }
+}
+
 // GET /api/scores/game/:gameName
 const getTopScoresByGame = async (req, res) => {
   try {
@@ -65,4 +82,4 @@ const getTopScoresByGame = async (req, res) => {
   }
 }
 
-export { createScore, getTopScoresByGame }
+export { createScore, getAllScores, getTopScoresByGame }

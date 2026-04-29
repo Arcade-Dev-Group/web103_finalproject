@@ -8,6 +8,7 @@ import Events from "./pages/Events";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Leaderboard from "./pages/Leaderboard";
 
 
 const API_URL = import.meta.env.PROD ? 'https://server-x77u.onrender.com' : '';
@@ -22,6 +23,7 @@ function App() {
     { path: "/contact", element: <Contact  api_url={API_URL}/> },
     { path: "/login", element: <Login  api_url={API_URL}/> },
     { path: "/signup", element: <Signup api_url={API_URL}/> },
+    { path: "/leaderboard", element: <Leaderboard api_url={API_URL}/> },
   ]);
 
   return routes;
