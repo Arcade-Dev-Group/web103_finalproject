@@ -33,8 +33,31 @@ function Contact() {
             <div className="menu-card">
               <h2>Visit Us</h2>
               <p>123 Neon Ave</p>
-              <p>Jacksonville, FL</p>
+              <p>Neon District, FL</p>
             </div>
+
+            <div class="menu-card">
+            <h2>Hours</h2>
+            <div class="hours-list">
+              <div class="hours-item">
+                <span>Mon - Thu</span>
+                <span>3PM - 12AM</span>
+              </div>
+              <div class="hours-item">
+                <span>Fri</span>
+                <span>3PM - 2AM</span>
+              </div>
+              <div class="hours-item">
+                <span>Sat</span>
+                <span>11AM - 2AM</span>
+              </div>
+              <div class="hours-item">
+                <span>Sun</span>
+                <span>11AM - 12AM</span>
+              </div>
+            </div>
+          </div>
+            
           </div>
         </section>
       </main>

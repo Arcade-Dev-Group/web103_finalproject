@@ -378,6 +378,76 @@ select:focus-visible {
   padding: 3rem 2rem;
 }
 
+.events-carousel {
+  position: relative;
+  max-width: 50rem;
+  margin: 2rem auto 0;
+  overflow: hidden;
+  border-radius: 1.2rem;
+  border: 2px solid var(--cyan);
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.4s ease;
+}
+
+.event-slide {
+  min-width: 100%;
+  padding: 2.5rem;
+  text-align: center;
+  background: var(--bg-3);
+}
+
+.event-slide h3 {
+  font-size: 2.4rem;
+  color: var(--pink);
+  margin-bottom: 1rem;
+}
+
+.event-slide p {
+  font-size: 1.6rem;
+  color: var(--cyan);
+  margin-bottom: 0.5rem;
+}
+
+.event-slide p:last-child {
+  color: var(--muted);
+  font-size: 1.5rem;
+}
+
+.carousel-prev,
+.carousel-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--cyan);
+  color: var(--bg);
+  border: none;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  font-size: 2.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 12px var(--shadow-cyan);
+}
+
+.carousel-prev {
+  left: 1rem;
+}
+
+.carousel-next {
+  right: 1rem;
+}
+
+.carousel-prev:hover,
+.carousel-next:hover {
+  background: var(--pink);
+  transform: translateY(-50%) scale(1.1);
+}
+
 /* Page grids */
 
 .games-section {
@@ -436,6 +506,38 @@ select:focus-visible {
   border-radius: 1.2rem;
   padding: 3rem;
   box-shadow: 0 0 18px rgba(0, 247, 255, 0.1);
+}
+
+.hours-list {
+  margin-top: 1.5rem;
+}
+
+.hours-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 1.6rem;
+}
+
+.hours-item:last-child {
+  border-bottom: none;
+}
+
+.hours-item span:first-child {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.hours-item span:last-child {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.menu-card h3 {
+  font-size: 2.2rem;
+  color: var(--pink);
+  margin: 1.5rem 0 1rem 0;
 }
 
 .menu-image,
