@@ -8,7 +8,7 @@ import Events from "./pages/Events";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Leaderboard from "./pages/Leaderboard";
+import Leaderboard from "./pages/leaderboard";
 
 
 const API_URL = import.meta.env.PROD ? 'https://server-x77u.onrender.com' : '';
